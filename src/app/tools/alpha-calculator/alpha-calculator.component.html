@@ -1,0 +1,21 @@
+<p>
+    This is a tool to calculate the actual color of things which have transparency.
+    You need to know how the color looks on two different backgrounds and enter this information here as hex code.
+</p>
+<form [formGroup]="form">
+    Visible color 1:
+    <input type="text" formControlName="result1">
+    Background color 1:
+    <input type="text" formControlName="background1"><br />
+
+    Visible color 2:
+    <input type="text" formControlName="result2">
+    Background color 2:
+    <input type="text" formControlName="background2"><br />
+
+    <button class="button" (click)="onSubmit(form.value)">Calculate</button>
+    
+    <span *ngIf="result">
+        {{result}} — Copied to clipboard!
+    </span>
+</form>
