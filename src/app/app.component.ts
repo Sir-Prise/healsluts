@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
         this.frame.height = this.videoElement.nativeElement.videoHeight;
         this.frameContext = this.frame.getContext('2d');
 
-        // // Analyze video
+        // Analyze video
         setInterval(() => {
             const start = Date.now();
 
@@ -58,8 +58,8 @@ export class AppComponent implements OnInit {
             this.screenDetectionService.getScreen(this.frame);
 
             // this.colorUtilsService.resetCache();
-            // // // @ts-ignore
-            // // console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens['matchAlive']));
+            // // @ts-ignore
+            // console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
             // this.colorUtilsService.pixelIsColor(this.frame, {x: 957, y: 539}, {r: 255, g: 255, b: 255, a: 0.79});
             // this.colorUtilsService.pixelIsColor(this.frame, {x: 962, y: 537}, {r: 0, g: 0, b: 0, a: 0.34});
 
@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
         this.frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
         this.colorUtilsService.resetCache();
         // @ts-ignore
-        console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
+        console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.deadSpectating));
         // this.screenDetectionService.getScreen(this.frame);
         // this.colorUtilsService.resetCache();
         // this.colorUtilsService.pixelIsColor(this.frame, {x: 1910, y: 1070}, {r: 215, g: 0, b: 5, a: 0.7});

@@ -102,7 +102,7 @@ export class ScreenDetectionService {
         matchAlive: {
             should: [
                 ...IN_GAME_RETICLE, // Can't be "must", because the red kill icon overlays the reticle
-                {x: 270, y: 966, color: MATCH_HEALTH_BAR_FILLED},
+                {x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED},
             ],
             might: [
                 {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
@@ -191,8 +191,8 @@ export class ScreenDetectionService {
                 this.checksSinceLastFullCheck < 5 &&
                 (lastProbability.probability >= 0.8 || (lastProbability.probability >= 0.6 && lastProbability.confidence <= 0.6))
             ) {
-                console.log(this.lastScreenName, lastProbability.probability, 'lastScreenName');
                 this.checksSinceLastFullCheck++;
+                console.log(this.lastScreenName, lastProbability.probability, 'lastScreenName');
                 return this.lastScreenName;
             }
         }
@@ -206,26 +206,26 @@ export class ScreenDetectionService {
         if (lastProbability) {
             screenProbabilities.push({screenName: this.lastScreenName, probability: lastProbability});
         }
-        // console.log('probabilities', screenProbabilities);
+        console.log('probabilities', screenProbabilities);
 
         // Get screen with highest probability
         const best = screenProbabilities.sort((a, b) => {
-            return b.probability.probability - a.probability.probability || b.probability.confidence - b.probability.confidence;
+            return b.probability.probability - a.probability.probability || b.probability.confidence - a.probability.confidence;
         })[0];
 
         console.log(best.screenName, best.probability.probability, 'best');
         this.checksSinceLastFullCheck = 0;
-        // this.lastScreenName = best.screenName;
+        this.lastScreenName = best.screenName;
         return best.screenName;
     }
 
-    private previousForgivenesses: Array<{x: number, y: number, time: number}> = [];
+    private previousForgivenesses: Array<{x: number, y: number, timesForgiven: number}> = [];
 
     /**
      * Calculates how many percent of ColorPosition match.
      *
-     * This returns two numbers: The probability tells how many pixels have expected color, the confidence how the quality of defined
-     * positions is (e.g. only "must" positions: 1, only "might": 0.3).
+     * This returns two numbers: The probability tells how many pixels have expected color, the confidence how reliable this information is
+     * (e.g. only "might" fields may have a high probability, but low confidence)
      */
     private getScreenProbability(
         frame: HTMLCanvasElement,
@@ -237,13 +237,35 @@ export class ScreenDetectionService {
             ...(screen.should || []).map((colorPosition) => ({factor: 0.7, maxForgivness: 1, colorPosition})),
             ...(screen.might || []).map((colorPosition) => ({factor: 0.3, maxForgivness: 2, colorPosition}))
         ];
+
+        const previousForgiveness = this.previousForgivenesses;
+        if (isCurrentScreen) {
+            this.previousForgivenesses = [];
+        }
+
         const sum = points.reduce((prev, curr) => {
-            // console.log('pxIsColor', this.colorUtilsService.pixelIsColor(frame, curr.colorPosition, curr.colorPosition.color), curr.colorPosition);
-            return prev + (this.colorUtilsService.pixelIsColor(frame, curr.colorPosition, curr.colorPosition.color) ? curr.factor : 0);
+            let pixelIsColor = this.colorUtilsService.pixelIsColor(frame, curr.colorPosition, curr.colorPosition.color);
+
+            // "should" and "might" values are allowed to not be the correct color for 1 or 2 detections
+            if (!pixelIsColor && isCurrentScreen && curr.maxForgivness > 0) {
+                const previousForgivenessForPixel = previousForgiveness.find(
+                    (forgivness) => forgivness.x === curr.colorPosition.x && forgivness.y === curr.colorPosition.y
+                );
+                const newTimesForgiven = previousForgivenessForPixel?.timesForgiven + 1 || 1;
+                if (newTimesForgiven <= curr.maxForgivness) {
+                    pixelIsColor = true;
+                    this.previousForgivenesses.push({x: curr.colorPosition.x, y: curr.colorPosition.y, timesForgiven: newTimesForgiven});
+                }
+            }
+            // console.log('pixelIsColor', pixelIsColor, curr.colorPosition); // TODO      
+
+            return prev + (pixelIsColor ? curr.factor : 0);
         }, 0);
+
         const sumMax = points.reduce((prev, curr) => prev + curr.factor, 0);
         const probability = sum / sumMax;
-        const confidence = sumMax / points.length;
+        const forgivenValues = isCurrentScreen ? this.previousForgivenesses.length : 0;
+        const confidence = sumMax * 0.7 ** forgivenValues / points.length;
         return {probability, confidence};
     }
 }
