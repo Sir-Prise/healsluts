@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
             // this.colorUtilsService.pixelIsColor(this.frame, {x: 962, y: 537}, {r: 0, g: 0, b: 0, a: 0.34});
 
 
-            console.log('took', Date.now() - start);
+            // console.log('took', Date.now() - start);
         }, 1000);
     }
 
@@ -72,9 +72,8 @@ export class AppComponent implements OnInit {
         this.frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
         this.colorUtilsService.resetCache();
         // @ts-ignore
-        console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.deadSpectating));
+        console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
         // this.screenDetectionService.getScreen(this.frame);
-        // this.colorUtilsService.resetCache();
         // this.colorUtilsService.pixelIsColor(this.frame, {x: 1910, y: 1070}, {r: 215, g: 0, b: 5, a: 0.7});
     }
 }

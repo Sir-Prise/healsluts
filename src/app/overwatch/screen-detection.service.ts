@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ColorRGBA } from '../model/color-rgba.model';
 import { ColorRGBAPosition } from '../model/color-rgba-position.model';
 import { ColorUtilsService } from '../utils/color-utils.service';
 
@@ -55,6 +54,9 @@ const IN_GAME_ON_FIRE_ICONS = [
     {x: 432, y: 996, color: IN_GAME_ON_FIRE_MAX_MARKER},
 ];
 
+type ScreenName = 'menues' | 'alertPopup' | 'loadingMap' | 'heroSelection' | 'matchAlive' | 'matchDead' | 'killcam' | 'deadSpectating' |
+    'potgSpectating' | 'scoreBoard' | 'undefined';
+
 @Injectable({
     providedIn: 'root'
 })
@@ -69,7 +71,12 @@ export class ScreenDetectionService {
                 {x: 1590, y: 40, color: MENUS_USER_BOX_BG},
                 {x: 1850, y: 80, color: MENUS_USER_BOX_BG},
                 {x: 1517, y: 64, color: MENUES_AVATAR_BAR},
-            ]
+            ],
+            nextScreens: {
+                alertPopup: 1,
+                loadingMap: 1,
+                undefined: 1,
+            }
         },
         alertPopup: {
             must: [
@@ -79,7 +86,10 @@ export class ScreenDetectionService {
                 {x: 1500, y: 530, color: ALERT_POPUP_TEXT_BG},
                 {x: 40, y: 590, color: ALERT_POPUP_ACTIONS_BG},
                 {x: 1900, y: 630, color: ALERT_POPUP_ACTIONS_BG},
-            ]
+            ],
+            nextScreens: {
+                // All equal
+            }
         },
         loadingMap: {
             must: [
@@ -87,7 +97,10 @@ export class ScreenDetectionService {
                 {x: 1800, y: 980, color: LOADING_MAP_OVERWATCH_LOGO},
                 {x: 20, y: 760, color: LOADING_MAP_TIP_BG},
                 {x: 570, y: 770, color: LOADING_MAP_TIP_BG},
-            ]
+            ],
+            nextScreens: {
+                heroSelection: 1
+            }
         },
         heroSelection: {
             must: [
@@ -97,7 +110,10 @@ export class ScreenDetectionService {
                 {x: 1855, y: 145, color: HERO_SELECTION_SKIN_EXCLAMATION_MARK_BG},
                 {x: 1750, y: 740, color: HERO_SELECTION_HORIZONTAL_LINE},
                 {x: 140, y: 740, color: HERO_SELECTION_HORIZONTAL_LINE},
-            ]
+            ],
+            nextScreens: {
+                matchAlive: 1
+            }
         },
         matchAlive: {
             should: [
@@ -107,7 +123,13 @@ export class ScreenDetectionService {
             might: [
                 {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
-            ]
+            ],
+            nextScreens: {
+                matchDead: 1,
+                scoreBoard: .7,
+                alertPopup: .1,
+                undefined: .3,
+            }
         },
         matchDead: {
             must: [
@@ -120,7 +142,12 @@ export class ScreenDetectionService {
             ],
             might: [
                 {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
-            ]
+            ],
+            nextScreens: {
+                killcam: 1,
+                scoreBoard: .7,
+                deadSpectating: .7,
+            }
         },
         killcam: {
             must: [
@@ -132,7 +159,12 @@ export class ScreenDetectionService {
                 {x: 1800, y: 900, color: KILLCAM_DARK_OVERLAY_BOTTOM},
                 {x: 300, y: 300, color: KILLCAM_DARK_GLBOAL_OVERLAY},
                 ...DARK_OVERLAY_TOP
-            ]
+            ],
+            nextScreens: {
+                deadSpectating: .9,
+                matchAlive: .9,
+                scoreBoard: .7,
+            }
         },
         deadSpectating: {
             must: [
@@ -143,6 +175,10 @@ export class ScreenDetectionService {
             should: [
                 {x: 1836, y: 18, color: SPECTATE_RESPAWN_COUNTDOWN_BORDER},
             ],
+            nextScreens: {
+                matchAlive: 1,
+                scoreBoard: .7,
+            }
         },
         potgSpectating: {
             must: [
@@ -155,7 +191,10 @@ export class ScreenDetectionService {
             might: [
                 {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
-            ]
+            ],
+            nextScreens: {
+                undefined: 1,
+            }
         },
         scoreBoard: {
             must: [
@@ -169,54 +208,83 @@ export class ScreenDetectionService {
                 {x: 963, y: 1010, color: SCORE_BOARD_LINES},
                 {x: 42, y: 50, color: SCORE_BOARD_MODE_LINES},
             ],
+            nextScreens: {
+                matchAlive: 1,
+                matchDead: 1,
+                killcam: .7,
+                deadSpectating: .7,
+                potgSpectating: .5,
+            }
+        },
+        undefined: {
+            // Default screen for not yet defined screens
+            // might: [{x: 10, y: 10, color: {r: 0, g: 0, b: 0, a: 0}}],
+            nextScreens: {
+                // All equal
+            }
         }
     };
 
-    private lastScreenName: string;
+    private readonly screenNames: ScreenName[];
+    private lastScreenName: ScreenName;
     private checksSinceLastFullCheck = 0;
 
     public constructor(
         private readonly colorUtilsService: ColorUtilsService,
     ) {
+        this.screenNames = Object.keys(this.screens) as ScreenName[];
     }
 
-    public getScreen(frame: HTMLCanvasElement): string {
+    public getScreen(frame: HTMLCanvasElement): ScreenName {
         this.colorUtilsService.resetCache();
 
-        // It's likely the same screen as last time, so check that first
-        let lastProbability: {probability: number, confidence: number};
+        // Get all screens and their defined probability based on which was the last screen
+        const screenBaseProbabilities = this.screenNames.reduce((prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
         if (this.lastScreenName) {
-            lastProbability = this.getScreenProbability(frame, this.screens[this.lastScreenName], true);
-            if (
-                this.checksSinceLastFullCheck < 5 &&
-                (lastProbability.probability >= 0.8 || (lastProbability.probability >= 0.6 && lastProbability.confidence <= 0.6))
-            ) {
-                this.checksSinceLastFullCheck++;
-                console.log(this.lastScreenName, lastProbability.probability, 'lastScreenName');
-                return this.lastScreenName;
+            const lastScreen = this.screens[this.lastScreenName];
+            for (const nextScreen of Object.entries(lastScreen.nextScreens)) {
+                screenBaseProbabilities[nextScreen[0]] = nextScreen[1];
+            }
+            screenBaseProbabilities[this.lastScreenName] = 10;
+        }
+        // Sort
+        const screenCheckOrder = Object.entries(screenBaseProbabilities)
+            .map((probabilityEntry) => ({name: probabilityEntry[0] as ScreenName, probability: probabilityEntry[1]}))
+            .sort((a, b) => {
+                // Randomize order of equal ranked screens
+                return b.probability - a.probability || Math.random() - .5;
+            })
+            .map((screenWithProbability) => screenWithProbability.name);
+
+        // Check the first random n possible screens, as long there's at least one with a high probability
+        const screenProbabilities: Array<{name: ScreenName, probability: ScreenProbability}> = [];
+        for (const screen of screenCheckOrder) {
+            if (screen === 'undefined') {
+                // "undefined" screens always have the same probability
+                screenProbabilities.push({name: 'undefined', probability: {probability: .7, confidence: .5}});
+            } else {
+                screenProbabilities.push({
+                    name: screen,
+                    probability: this.getScreenProbability(frame, this.screens[screen], screen === this.lastScreenName)
+                });
+            }
+
+            if (screenProbabilities.some((screenProbability) => screenProbability.probability.probability >= .8) && Math.random() > .8) {
+                break;
             }
         }
 
-        // Calculate probabilities for all screens
-        const screens = Object.entries(this.screens).filter((screen) => screen[0] !== this.lastScreenName);
-        const screenProbabilities = screens.map((screen) => ({
-            screenName: screen[0],
-            probability: this.getScreenProbability(frame, screen[1], false)
-        }));
-        if (lastProbability) {
-            screenProbabilities.push({screenName: this.lastScreenName, probability: lastProbability});
-        }
-        console.log('probabilities', screenProbabilities);
+        // Get the screen with the highest probability (sort by pixel probability, previous screen prob., confidence)
+        const sortedScreens = screenProbabilities.sort((a, b) => {
+            return b.probability.probability - a.probability.probability ||
+                screenBaseProbabilities[b.name] - screenBaseProbabilities[a.name] ||
+                b.probability.confidence - a.probability.confidence;
+        });
 
-        // Get screen with highest probability
-        const best = screenProbabilities.sort((a, b) => {
-            return b.probability.probability - a.probability.probability || b.probability.confidence - a.probability.confidence;
-        })[0];
+        this.lastScreenName = sortedScreens[0].name;
 
-        console.log(best.screenName, best.probability.probability, 'best');
-        this.checksSinceLastFullCheck = 0;
-        this.lastScreenName = best.screenName;
-        return best.screenName;
+        console.log(this.lastScreenName, sortedScreens);
+        return this.lastScreenName;
     }
 
     private previousForgivenesses: Array<{x: number, y: number, timesForgiven: number}> = [];
@@ -224,14 +292,14 @@ export class ScreenDetectionService {
     /**
      * Calculates how many percent of ColorPosition match.
      *
-     * This returns two numbers: The probability tells how many pixels have expected color, the confidence how reliable this information is
-     * (e.g. only "might" fields may have a high probability, but low confidence)
+     * This returns two numbers: The probability tells how many pixels have the expected color, the confidence how reliable this information
+     * is (e.g. only "might" fields may have a high probability, but low confidence)
      */
     private getScreenProbability(
         frame: HTMLCanvasElement,
         screen: Screen,
         isCurrentScreen: boolean
-    ): {probability: number, confidence: number} {
+    ): ScreenProbability {
         const points = [
             ...(screen.must || []).map((colorPosition) => ({factor: 1, maxForgivness: 0, colorPosition})),
             ...(screen.should || []).map((colorPosition) => ({factor: 0.7, maxForgivness: 1, colorPosition})),
@@ -257,25 +325,40 @@ export class ScreenDetectionService {
                     this.previousForgivenesses.push({x: curr.colorPosition.x, y: curr.colorPosition.y, timesForgiven: newTimesForgiven});
                 }
             }
-            // console.log('pixelIsColor', pixelIsColor, curr.colorPosition); // TODO      
+            console.log('pixelIsColor', pixelIsColor, curr.colorPosition); // TODO      
 
             return prev + (pixelIsColor ? curr.factor : 0);
         }, 0);
 
         const sumMax = points.reduce((prev, curr) => prev + curr.factor, 0);
         const probability = sum / sumMax;
-        const forgivenValues = isCurrentScreen ? this.previousForgivenesses.length : 0;
-        const confidence = sumMax * 0.7 ** forgivenValues / points.length;
+
+        // Calculate confidence
+        // Decrease for forgiven values
+        const forgivenValuesFactor = .7 ** (isCurrentScreen ? this.previousForgivenesses.length : 0);
+        // Decrease for colors with high transparency
+        const transparencyFactor = .8 ** points.filter((point) => point.colorPosition.color.a < .5).length;
+        // Decrease for black + white
+        const colorFactor = .9 ** points.map((point) => {
+            const color = point.colorPosition.color;
+            return color.r + color.g + color.b;
+        }).filter((color) => color === 0 || color === 255 * 3).length;
+        const confidence = sumMax * forgivenValuesFactor * transparencyFactor * colorFactor / points.length;
+
         return {probability, confidence};
     }
 }
 
-interface ScreensModel {
-    [screenName: string]: Screen;
-}
+type ScreensModel = Record<ScreenName, Screen>;
 
 interface Screen {
     must?: ColorRGBAPosition[];
     should?: ColorRGBAPosition[];
     might?: ColorRGBAPosition[];
+    nextScreens: Partial<Record<ScreenName, number>>;
+}
+
+interface ScreenProbability {
+    probability: number;
+    confidence: number;
 }
