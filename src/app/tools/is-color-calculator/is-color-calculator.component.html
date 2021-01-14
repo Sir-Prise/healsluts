@@ -1,0 +1,16 @@
+<p>
+    This calculates if a color is considered as matching or not.
+</p>
+<form [formGroup]="form">
+    Visible color:
+    <input type="text" formControlName="test">
+    <br />
+    Defined color:
+    <input type="text" formControlName="r">
+    <input type="text" formControlName="g">
+    <input type="text" formControlName="b">
+    <input type="text" formControlName="a">
+    <br />
+    <button (click)="onSubmit(form.value)">Calculate</button>
+</form>
+<p>{{result}}</p>

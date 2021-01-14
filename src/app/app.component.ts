@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ColorUtilsService } from './utils/color-utils.service';
 import { ScreenDetectionService } from './overwatch/screen-detection.service';
+import { OnFireDetectionService } from './overwatch/on-fire-detection.service';
 
 const FRAME_RATE = 10;
 
@@ -20,6 +21,7 @@ export class AppComponent implements OnInit {
     public constructor(
         private readonly colorUtilsService: ColorUtilsService,
         private readonly screenDetectionService: ScreenDetectionService,
+        private readonly onFireDetectionService: OnFireDetectionService,
     ) {
     }
 
@@ -50,29 +52,34 @@ export class AppComponent implements OnInit {
         this.frameContext = this.frame.getContext('2d');
 
         // Analyze video
-        setInterval(() => {
-            const start = Date.now();
+        // setInterval(() => {
+        //     const start = Date.now();
 
-            this.frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
+        //     this.frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
             
-            this.screenDetectionService.getScreen(this.frame);
+        //     this.colorUtilsService.resetCache();
 
-            // this.colorUtilsService.resetCache();
-            // // @ts-ignore
-            // console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
-            // this.colorUtilsService.pixelIsColor(this.frame, {x: 957, y: 539}, {r: 255, g: 255, b: 255, a: 0.79});
-            // this.colorUtilsService.pixelIsColor(this.frame, {x: 962, y: 537}, {r: 0, g: 0, b: 0, a: 0.34});
+        //     this.screenDetectionService.getScreen(this.frame);
+
+        //     // this.colorUtilsService.resetCache();
+        //     // // @ts-ignore
+        //     // console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
+        //     // this.colorUtilsService.pixelIsColor(this.frame, {x: 957, y: 539}, {r: 255, g: 255, b: 255, a: 0.79});
+        //     // this.colorUtilsService.pixelIsColor(this.frame, {x: 962, y: 537}, {r: 0, g: 0, b: 0, a: 0.34});
 
 
-            // console.log('took', Date.now() - start);
-        }, 1000);
+        //     // console.log('took', Date.now() - start);
+        // }, 1000);
     }
 
     public onAnalyze(): void {
         this.frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
         this.colorUtilsService.resetCache();
+
+        console.log(this.onFireDetectionService.getOnFireLevel(this.frame));
+
         // @ts-ignore
-        console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
+        // console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
         // this.screenDetectionService.getScreen(this.frame);
         // this.colorUtilsService.pixelIsColor(this.frame, {x: 1910, y: 1070}, {r: 215, g: 0, b: 5, a: 0.7});
     }

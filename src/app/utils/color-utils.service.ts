@@ -64,11 +64,11 @@ export class ColorUtilsService {
 
         // Basically checks if it would possible to get the color on a white background and on a black background (but for each channel)
         return (
-            visibleColor.r + tolerance >= compareColor.r * alpha && 
+            visibleColor.r + tolerance >= compareColor.r * alpha &&
             visibleColor.r - tolerance <= compareColor.r * alpha + 255 * (1 - alpha) &&
-            visibleColor.g + tolerance >= compareColor.g * alpha && 
+            visibleColor.g + tolerance >= compareColor.g * alpha &&
             visibleColor.g - tolerance <= compareColor.g * alpha + 255 * (1 - alpha) &&
-            visibleColor.b + tolerance >= compareColor.b * alpha && 
+            visibleColor.b + tolerance >= compareColor.b * alpha &&
             visibleColor.b - tolerance <= compareColor.b * alpha + 255 * (1 - alpha)
         );
     }

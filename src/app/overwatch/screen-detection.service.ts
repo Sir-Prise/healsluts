@@ -236,8 +236,6 @@ export class ScreenDetectionService {
     }
 
     public getScreen(frame: HTMLCanvasElement): ScreenName {
-        this.colorUtilsService.resetCache();
-
         // Get all screens and their defined probability based on which was the last screen
         const screenBaseProbabilities = this.screenNames.reduce((prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
         if (this.lastScreenName) {
@@ -325,7 +323,7 @@ export class ScreenDetectionService {
                     this.previousForgivenesses.push({x: curr.colorPosition.x, y: curr.colorPosition.y, timesForgiven: newTimesForgiven});
                 }
             }
-            console.log('pixelIsColor', pixelIsColor, curr.colorPosition); // TODO      
+            // console.log('pixelIsColor', pixelIsColor, curr.colorPosition); // TODO      
 
             return prev + (pixelIsColor ? curr.factor : 0);
         }, 0);
