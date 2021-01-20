@@ -54,14 +54,6 @@ export class ColorUtilsService {
         // Also set an absolute tolerance as relative tolerance is useless at low values
         const tolerance = 10;
 
-        // console.log('colors', visibleColor, compareColor);
-        // if (!(visibleColor.r >= compareColor.r * alpha)) console.log('visibleColor.r >= compareColor.r * alpha');
-        // if (!(visibleColor.r <= compareColor.r * alpha + 255 * (1 - alpha))) console.log('visibleColor.r <= compareColor.r * alpha + 255 * (1 - alpha)');
-        // if (!(visibleColor.g >= compareColor.g * alpha)) console.log('visibleColor.g >= compareColor.g * alpha');
-        // if (!(visibleColor.g <= compareColor.g * alpha + 255 * (1 - alpha))) console.log('visibleColor.g <= compareColor.g * alpha + 255 * (1 - alpha)');
-        // if (!(visibleColor.b >= compareColor.b * alpha)) console.log('visibleColor.b >= compareColor.b * alpha');
-        // if (!(visibleColor.b <= compareColor.b * alpha + 255 * (1 - alpha))) console.log('visibleColor.b <= compareColor.b * alpha + 255 * (1 - alpha)');
-
         // Basically checks if it would possible to get the color on a white background and on a black background (but for each channel)
         return (
             visibleColor.r + tolerance >= compareColor.r * alpha &&

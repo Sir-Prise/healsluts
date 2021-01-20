@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ColorRGBAPosition } from '../model/color-rgba-position.model';
 import { ColorUtilsService } from '../utils/color-utils.service';
+import { FrameService } from './frame.service';
 
 // Colors
 const MENUES_ADD_FRIEND_BTN_BG = {r: 50, g: 159, b: 231, a: 0.92};
@@ -227,62 +230,70 @@ export class ScreenDetectionService {
 
     private readonly screenNames: ScreenName[];
     private lastScreenName: ScreenName;
-    private checksSinceLastFullCheck = 0;
 
     public constructor(
+        private readonly frameService: FrameService,
         private readonly colorUtilsService: ColorUtilsService,
     ) {
         this.screenNames = Object.keys(this.screens) as ScreenName[];
     }
 
-    public getScreen(frame: HTMLCanvasElement): ScreenName {
-        // Get all screens and their defined probability based on which was the last screen
-        const screenBaseProbabilities = this.screenNames.reduce((prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
-        if (this.lastScreenName) {
-            const lastScreen = this.screens[this.lastScreenName];
-            for (const nextScreen of Object.entries(lastScreen.nextScreens)) {
-                screenBaseProbabilities[nextScreen[0]] = nextScreen[1];
-            }
-            screenBaseProbabilities[this.lastScreenName] = 10;
-        }
-        // Sort
-        const screenCheckOrder = Object.entries(screenBaseProbabilities)
-            .map((probabilityEntry) => ({name: probabilityEntry[0] as ScreenName, probability: probabilityEntry[1]}))
-            .sort((a, b) => {
-                // Randomize order of equal ranked screens
-                return b.probability - a.probability || Math.random() - .5;
-            })
-            .map((screenWithProbability) => screenWithProbability.name);
+    public getScreen(): Observable<{frame: HTMLCanvasElement, screen: ScreenName}> {
+        return this.frameService.getFrame().pipe(
+            map((frame) => {
+                // Get all screens and their defined probability based on which was the last screen
+                const screenBaseProbabilities = this.screenNames.reduce(
+                    (prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
+                if (this.lastScreenName) {
+                    const lastScreen = this.screens[this.lastScreenName];
+                    for (const nextScreen of Object.entries(lastScreen.nextScreens)) {
+                        screenBaseProbabilities[nextScreen[0]] = nextScreen[1];
+                    }
+                    screenBaseProbabilities[this.lastScreenName] = 10;
+                }
+                // Sort
+                const screenCheckOrder = Object.entries(screenBaseProbabilities)
+                    .map((probabilityEntry) => ({name: probabilityEntry[0] as ScreenName, probability: probabilityEntry[1]}))
+                    .sort((a, b) => {
+                        // Randomize order of equal ranked screens
+                        return b.probability - a.probability || Math.random() - .5;
+                    })
+                    .map((screenWithProbability) => screenWithProbability.name);
 
-        // Check the first random n possible screens, as long there's at least one with a high probability
-        const screenProbabilities: Array<{name: ScreenName, probability: ScreenProbability}> = [];
-        for (const screen of screenCheckOrder) {
-            if (screen === 'undefined') {
-                // "undefined" screens always have the same probability
-                screenProbabilities.push({name: 'undefined', probability: {probability: .7, confidence: .5}});
-            } else {
-                screenProbabilities.push({
-                    name: screen,
-                    probability: this.getScreenProbability(frame, this.screens[screen], screen === this.lastScreenName)
+                // Check the first random n possible screens, as long there's at least one with a high probability
+                const screenProbabilities: Array<{name: ScreenName, probability: ScreenProbability}> = [];
+                for (const screen of screenCheckOrder) {
+                    if (screen === 'undefined') {
+                        // "undefined" screens always have the same probability
+                        screenProbabilities.push({name: 'undefined', probability: {probability: .7, confidence: .5}});
+                    } else {
+                        screenProbabilities.push({
+                            name: screen,
+                            probability: this.getScreenProbability(frame, this.screens[screen], screen === this.lastScreenName)
+                        });
+                    }
+
+                    if (
+                        screenProbabilities.some((screenProbability) => screenProbability.probability.probability >= .8) &&
+                        Math.random() > .8
+                    ) {
+                        break;
+                    }
+                }
+
+                // Get the screen with the highest probability (sort by pixel probability, previous screen probability, confidence)
+                const sortedScreens = screenProbabilities.sort((a, b) => {
+                    return b.probability.probability - a.probability.probability ||
+                        screenBaseProbabilities[b.name] - screenBaseProbabilities[a.name] ||
+                        b.probability.confidence - a.probability.confidence;
                 });
-            }
 
-            if (screenProbabilities.some((screenProbability) => screenProbability.probability.probability >= .8) && Math.random() > .8) {
-                break;
-            }
-        }
+                this.lastScreenName = sortedScreens[0].name;
 
-        // Get the screen with the highest probability (sort by pixel probability, previous screen prob., confidence)
-        const sortedScreens = screenProbabilities.sort((a, b) => {
-            return b.probability.probability - a.probability.probability ||
-                screenBaseProbabilities[b.name] - screenBaseProbabilities[a.name] ||
-                b.probability.confidence - a.probability.confidence;
-        });
-
-        this.lastScreenName = sortedScreens[0].name;
-
-        console.log(this.lastScreenName, sortedScreens);
-        return this.lastScreenName;
+                // console.log('Detected screen', this.lastScreenName, sortedScreens);
+                return {frame, screen: this.lastScreenName};
+            })
+        );
     }
 
     private previousForgivenesses: Array<{x: number, y: number, timesForgiven: number}> = [];
@@ -323,7 +334,6 @@ export class ScreenDetectionService {
                     this.previousForgivenesses.push({x: curr.colorPosition.x, y: curr.colorPosition.y, timesForgiven: newTimesForgiven});
                 }
             }
-            // console.log('pixelIsColor', pixelIsColor, curr.colorPosition); // TODO      
 
             return prev + (pixelIsColor ? curr.factor : 0);
         }, 0);
