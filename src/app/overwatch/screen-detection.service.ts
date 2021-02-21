@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ColorRGBAPosition } from '../model/color-rgba-position.model';
+import { ImageDisplayService } from '../tools/image-display.service';
 import { ColorUtilsService } from '../utils/color-utils.service';
 import { FrameService } from './frame.service';
 
@@ -59,6 +60,17 @@ const IN_GAME_ON_FIRE_ICONS = [
 
 type ScreenName = 'menues' | 'alertPopup' | 'loadingMap' | 'heroSelection' | 'matchAlive' | 'matchDead' | 'killcam' | 'deadSpectating' |
     'potgSpectating' | 'scoreBoard' | 'undefined';
+/* TODO Screens:
+ * interactionMenu
+ * scoreScreen		(e.g. 1:0)
+ * matchNoPrimary	(e.g. Bastion transform, ana sleep, emote, roadhog hooked)
+ * matchResult		("e.g. VICTORY")
+ * victoryPoses
+ * potgIntro
+ * cards
+ * endorsementSelector
+ * stats			(stats shown after the match)
+ */
 
 @Injectable({
     providedIn: 'root'
@@ -231,8 +243,11 @@ export class ScreenDetectionService {
     private readonly screenNames: ScreenName[];
     private lastScreenName: ScreenName;
 
+    public reliability = new Map<ScreenName, {correct: number, incorrect: number}>();
+
     public constructor(
-        private readonly frameService: FrameService,
+        // private readonly frameService: FrameService,
+        private readonly frameService: ImageDisplayService,
         private readonly colorUtilsService: ColorUtilsService,
     ) {
         this.screenNames = Object.keys(this.screens) as ScreenName[];
@@ -240,7 +255,7 @@ export class ScreenDetectionService {
 
     public getScreen(): Observable<{frame: HTMLCanvasElement, screen: ScreenName}> {
         return this.frameService.getFrame().pipe(
-            map((frame) => {
+            map(({frame, expected}) => {
                 // Get all screens and their defined probability based on which was the last screen
                 const screenBaseProbabilities = this.screenNames.reduce(
                     (prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
@@ -290,7 +305,23 @@ export class ScreenDetectionService {
 
                 this.lastScreenName = sortedScreens[0].name;
 
-                // console.log('Detected screen', this.lastScreenName, sortedScreens);
+
+                // Testing reliability
+                if (!this.screenNames.includes(expected as ScreenName)) {
+                    expected = 'undefined';
+                }
+                if (!this.reliability.has(expected as ScreenName)) {
+                    this.reliability.set(expected as ScreenName, {correct: 0, incorrect: 0});
+                }
+                const mapEntry = this.reliability.get(expected as ScreenName);
+                if (this.lastScreenName === expected) {
+                    mapEntry.correct++;
+                } else {
+                    mapEntry.incorrect++;
+                }
+                // this.reliability.set(expected as ScreenName, mapEntry);
+                // console.log('Detected screen', this.lastScreenName, expected, this.reliability, sortedScreens);
+
                 return {frame, screen: this.lastScreenName};
             })
         );

@@ -23,7 +23,7 @@ export class ColorUtilsService {
         this.pixelContext = canvas.getContext('2d');
     }
 
-    private getPixelColor(frame: HTMLCanvasElement, position: Position): Color {
+    public getPixelColor(frame: HTMLCanvasElement, position: Position): Color {
         // Check if already analyzed
         const cachedValue = this.pixelColorCache.find((colorPosition) => colorPosition.x === position.x && colorPosition.y === position.y);
         if (cachedValue) {
