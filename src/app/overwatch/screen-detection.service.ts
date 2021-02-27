@@ -33,6 +33,8 @@ const SCORE_BOARD_TOP_BOTTOM_BG = {r: 0, g: 0, b: 0, a: 0.95};
 const SCORE_BOARD_GLOBAL_OVERLAY = {r: 0, g: 0, b: 0, a: 0.79};
 const SCORE_BOARD_LINES = {r: 255, g: 255, b: 255, a: 0.2};
 const SCORE_BOARD_MODE_LINES = {r: 255, g: 255, b: 255, a: 0.27};
+const INTERACTION_MENU_OUTER_CIRCLE = {r: 255, g: 255, b: 255, a: 1};
+const INTERACTION_MENU_OVERLAY = {r: 0, g: 0, b: 0, a: 0.73};
 
 const DARK_OVERLAY_TOP_BORDER = {r: 255, g: 255, b: 255, a: 0.2};
 const DARK_OVERLAY_TOP_BG = {r: 0, g: 0, b: 0, a: 0.36};
@@ -58,12 +60,10 @@ const IN_GAME_ON_FIRE_ICONS = [
     {x: 432, y: 996, color: IN_GAME_ON_FIRE_MAX_MARKER},
 ];
 
-type ScreenName = 'menues' | 'alertPopup' | 'loadingMap' | 'heroSelection' | 'matchAlive' | 'matchDead' | 'killcam' | 'deadSpectating' |
-    'potgSpectating' | 'scoreBoard' | 'undefined';
+type ScreenName = 'menues' | 'alertPopup' | 'loadingMap' | 'heroSelection' | 'matchAlive' | 'matchNoPrimary' | 'matchDead' | 'killcam' | 'deadSpectating' |
+    'potgSpectating' | 'scoreBoard' | 'interactionMenu' | 'undefined';
 /* TODO Screens:
- * interactionMenu
  * scoreScreen		(e.g. 1:0)
- * matchNoPrimary	(e.g. Bastion transform, ana sleep, emote, roadhog hooked)
  * matchResult		("e.g. VICTORY")
  * victoryPoses
  * potgIntro
@@ -142,8 +142,23 @@ export class ScreenDetectionService {
             nextScreens: {
                 matchDead: 1,
                 scoreBoard: .7,
+                interactionMenu: .5,
+                matchNoPrimary: .4,
                 alertPopup: .1,
                 undefined: .3,
+            }
+        },
+        matchNoPrimary: {
+            should: [
+                {x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED}
+            ],
+            might: [
+                {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
+                ...IN_GAME_ON_FIRE_ICONS,
+            ],
+            nextScreens: {
+                matchAlive: 1,
+                matchDead: .9
             }
         },
         matchDead: {
@@ -229,6 +244,22 @@ export class ScreenDetectionService {
                 killcam: .7,
                 deadSpectating: .7,
                 potgSpectating: .5,
+            }
+        },
+        interactionMenu: {
+            must: [
+                {x: 885, y: 485, color: INTERACTION_MENU_OUTER_CIRCLE},
+                {x: 1030, y: 600, color: INTERACTION_MENU_OUTER_CIRCLE},
+            ],
+            should: [
+                {x: 10, y: 10, color: INTERACTION_MENU_OVERLAY},
+                {x: 1910, y: 1070, color: INTERACTION_MENU_OVERLAY},
+                {x: 1500, y: 70, color: INTERACTION_MENU_OVERLAY},
+                {x: 261, y: 966, color: INTERACTION_MENU_OVERLAY},
+            ],
+            nextScreens: {
+                matchAlive: 1,
+                matchNoPrimary: .7
             }
         },
         undefined: {
