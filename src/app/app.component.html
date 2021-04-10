@@ -1,23 +1,19 @@
-<button (click)="onStart()">Start</button><br>
-<button (click)="onAnalyze()">Analyze</button><br>
+<h2>From screen</h2>
+<button (click)="onStartVideo()">Start video</button><br>
+<button (click)="onStartAnalyze()">Start analyze</button><br>
+<button (click)="onAnalyzeFrame()">Analyze frame</button>
+<input #expectedScreen type="text" placeholder="Expected screen" /><br>
 <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video><br>
 
-<!-- Testing utils -->
-Test video:<br />
+<h2>From video</h2>
 Description: <input type="file" accept="text/plain" (change)="this.onChangeTestVideoDescription($event.target.files)"/><br />
 Video: <input type="file" accept="video/*" (change)="this.onChangeTestVideo($event.target.files)"/><br />
 <video #videoTest width="1920" height="1080" autoplay muted style="width: 192px; height: 108px;"></video><br />
 
-Describe test video: <input type="file" accept="video/*" (change)="onChangeDescribeVideo($event.target.files)"/><br />
-<video #videoDescribe width="1920" height="1080" controls style="width: 960px; height: 540px;"></video><br />
-<button (click)="onDescribeVideoMark()">Mark position</button>
-<button (click)="onDescribeVideoMove(-2000)">-2s</button>
-<button (click)="onDescribeVideoMove(-100)">-100ms</button>
-<button (click)="onDescribeVideoMove(100)">+100ms</button>
-<button (click)="onDescribeVideoSpeed(0.5)">x0.5</button>
-<button (click)="onDescribeVideoSpeed(1)">x1</button>
-<button (click)="onDescribeVideoSpeed(2)">x2</button>
-<br /><textarea #videoDescription style="width: 300px; height: 200px;"></textarea><br />
-
+<h2>Debugging tools</h2>
+<h3>Annotate video</h3>
+<app-video-annotator></app-video-annotator>
+<h3>Color calculator</h3>
 <app-alpha-calculator></app-alpha-calculator>
+<h3>Check color match</h3>
 <app-is-color-calculator></app-is-color-calculator>

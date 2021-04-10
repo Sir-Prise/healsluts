@@ -1,0 +1,11 @@
+Describe test video: <input type="file" accept="video/*" (change)="onChangeDescribeVideo($event.target.files)"/><br />
+<video #videoDescribe width="1920" height="1080" controls style="width: 960px; height: 540px;"></video><br />
+<button (click)="onDescribeVideoMark()">Mark position</button>
+<button (click)="onDescribeVideoMove(-2000)">-2s</button>
+<button (click)="onDescribeVideoMove(-100)">-100ms</button>
+<button (click)="onDescribeVideoMove(100)">+100ms</button>
+<button (click)="onDescribeVideoSpeed(0.5)">x0.5</button>
+<button (click)="onDescribeVideoSpeed(1)">x1</button>
+<button (click)="onDescribeVideoSpeed(2)">x2</button>
+<br />
+<textarea #videoDescription style="width: 300px; height: 200px;"></textarea>

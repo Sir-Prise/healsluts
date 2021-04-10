@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ColorRGBAPosition } from '../model/color-rgba-position.model';
+import { ColorDifferenceService } from '../tools/color-difference.service';
 import { ImageDisplayService } from '../tools/image-display.service';
 import { ColorUtilsService } from '../utils/color-utils.service';
 import { FrameService } from './frame.service';
@@ -45,19 +46,19 @@ const IN_GAME_ON_FIRE_MAX_MARKER = {r: 255, g: 255, b: 255, a: 0.79};
 
 // Common color positions
 const DARK_OVERLAY_TOP = [
-    {x: 200, y: 126, color: DARK_OVERLAY_TOP_BORDER},
-    {x: 1800, y: 127, color: DARK_OVERLAY_TOP_BORDER},
-    {x: 120, y: 115, color: DARK_OVERLAY_TOP_BG},
-    {x: 1700, y: 25, color: DARK_OVERLAY_TOP_BG},
+    {name: 'dark overlay top border ul', x: 200, y: 126, color: DARK_OVERLAY_TOP_BORDER},
+    {name: 'dark overlay top ur', x: 1800, y: 127, color: DARK_OVERLAY_TOP_BORDER},
+    {name: 'dark overlay top bg ul', x: 120, y: 115, color: DARK_OVERLAY_TOP_BG},
+    {name: 'dark overlay top bg ur', x: 1700, y: 25, color: DARK_OVERLAY_TOP_BG},
 ];
 const IN_GAME_RETICLE = [
     // Currently, browsers always capture the cursor which overlays the reticle, so I picked a visible corner, not the center
-    {x: 957, y: 539, color: IN_GAME_RETICLE_BG},
-    {x: 962, y: 537, color: IN_GAME_RETICLE_BORDER},
+    {name: 'reticle bg', x: 957, y: 539, color: IN_GAME_RETICLE_BG},
+    {name: 'reticle border', x: 962, y: 537, color: IN_GAME_RETICLE_BORDER},
 ];
 const IN_GAME_ON_FIRE_ICONS = [
-    {x: 257, y: 997, color: IN_GAME_ON_FIRE_ICON},
-    {x: 432, y: 996, color: IN_GAME_ON_FIRE_MAX_MARKER},
+    {name: 'on fire icon', x: 257, y: 997, color: IN_GAME_ON_FIRE_ICON},
+    {name: 'on fire max marker', x: 432, y: 996, color: IN_GAME_ON_FIRE_MAX_MARKER},
 ];
 
 type ScreenName = 'menues' | 'alertPopup' | 'loadingMap' | 'heroSelection' | 'matchAlive' | 'matchNoPrimary' | 'matchDead' | 'killcam' | 'deadSpectating' |
@@ -79,13 +80,13 @@ export class ScreenDetectionService {
     private readonly screens: ScreensModel = {
         menues: {
             must: [
-                {x: 1454, y: 39, color: MENUES_ADD_FRIEND_BTN_BG},
-                {x: 1494, y: 80, color: MENUES_ADD_FRIEND_BTN_BG},
-                {x: 1430, y: 40, color: MENUES_FIND_GROUP_BTN_BG},
-                {x: 1390, y: 80, color: MENUES_FIND_GROUP_BTN_BG},
-                {x: 1590, y: 40, color: MENUS_USER_BOX_BG},
-                {x: 1850, y: 80, color: MENUS_USER_BOX_BG},
-                {x: 1517, y: 64, color: MENUES_AVATAR_BAR},
+                {name: 'add friend button ul', x: 1454, y: 39, color: MENUES_ADD_FRIEND_BTN_BG},
+                {name: 'add friend button lr', x: 1494, y: 80, color: MENUES_ADD_FRIEND_BTN_BG},
+                {name: 'find group button ur', x: 1430, y: 40, color: MENUES_FIND_GROUP_BTN_BG},
+                {name: 'find group button ll', x: 1390, y: 80, color: MENUES_FIND_GROUP_BTN_BG},
+                {name: 'user box bg ul', x: 1590, y: 40, color: MENUS_USER_BOX_BG},
+                {name: 'user box bg lr', x: 1850, y: 80, color: MENUS_USER_BOX_BG},
+                {name: 'avatar bar', x: 1517, y: 64, color: MENUES_AVATAR_BAR},
             ],
             nextScreens: {
                 alertPopup: 1,
@@ -95,12 +96,12 @@ export class ScreenDetectionService {
         },
         alertPopup: {
             must: [
-                {x: 300, y: 200, color: ALERT_POPUP_BG},
-                {x: 1400, y: 1000, color: ALERT_POPUP_BG},
-                {x: 20, y: 490, color: ALERT_POPUP_TEXT_BG},
-                {x: 1500, y: 530, color: ALERT_POPUP_TEXT_BG},
-                {x: 40, y: 590, color: ALERT_POPUP_ACTIONS_BG},
-                {x: 1900, y: 630, color: ALERT_POPUP_ACTIONS_BG},
+                {name: 'bg ul', x: 300, y: 200, color: ALERT_POPUP_BG},
+                {name: 'bg lr', x: 1400, y: 1000, color: ALERT_POPUP_BG},
+                {name: 'text bg ul', x: 20, y: 490, color: ALERT_POPUP_TEXT_BG},
+                {name: 'text bg lr', x: 1500, y: 530, color: ALERT_POPUP_TEXT_BG},
+                {name: 'actions bg ul', x: 40, y: 590, color: ALERT_POPUP_ACTIONS_BG},
+                {name: 'actions bg lr', x: 1900, y: 630, color: ALERT_POPUP_ACTIONS_BG},
             ],
             nextScreens: {
                 // All equal
@@ -108,10 +109,10 @@ export class ScreenDetectionService {
         },
         loadingMap: {
             must: [
-                {x: 1750, y: 940, color: LOADING_MAP_OVERWATCH_LOGO},
-                {x: 1800, y: 980, color: LOADING_MAP_OVERWATCH_LOGO},
-                {x: 20, y: 760, color: LOADING_MAP_TIP_BG},
-                {x: 570, y: 770, color: LOADING_MAP_TIP_BG},
+                {name: 'overwatch logo ul', x: 1750, y: 940, color: LOADING_MAP_OVERWATCH_LOGO},
+                {name: 'overwatch logo lr', x: 1800, y: 980, color: LOADING_MAP_OVERWATCH_LOGO},
+                {name: 'tip bg ul', x: 20, y: 760, color: LOADING_MAP_TIP_BG},
+                {name: 'tip bg lr', x: 570, y: 770, color: LOADING_MAP_TIP_BG},
             ],
             nextScreens: {
                 heroSelection: 1
@@ -119,12 +120,12 @@ export class ScreenDetectionService {
         },
         heroSelection: {
             must: [
-                {x: 1425, y: 220, color: HERO_SELECTION_SKIN_BG},
-                {x: 1800, y: 230, color: HERO_SELECTION_SKIN_BG},
-                {x: 1815, y: 120, color: HERO_SELECTION_SKIN_EXCLAMATION_MARK_BG},
-                {x: 1855, y: 145, color: HERO_SELECTION_SKIN_EXCLAMATION_MARK_BG},
-                {x: 1750, y: 740, color: HERO_SELECTION_HORIZONTAL_LINE},
-                {x: 140, y: 740, color: HERO_SELECTION_HORIZONTAL_LINE},
+                {name: 'skin bg ul', x: 1425, y: 220, color: HERO_SELECTION_SKIN_BG},
+                {name: 'skin bg lr', x: 1800, y: 230, color: HERO_SELECTION_SKIN_BG},
+                {name: 'exclamation mark bg ul', x: 1815, y: 120, color: HERO_SELECTION_SKIN_EXCLAMATION_MARK_BG},
+                {name: 'exclamation mark bg lr', x: 1855, y: 145, color: HERO_SELECTION_SKIN_EXCLAMATION_MARK_BG},
+                {name: 'horizontal line l', x: 140, y: 740, color: HERO_SELECTION_HORIZONTAL_LINE},
+                {name: 'horizontal line r', x: 1750, y: 740, color: HERO_SELECTION_HORIZONTAL_LINE},
             ],
             nextScreens: {
                 matchAlive: 1
@@ -133,10 +134,10 @@ export class ScreenDetectionService {
         matchAlive: {
             should: [
                 ...IN_GAME_RETICLE, // Can't be "must", because the red kill icon overlays the reticle
-                {x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED},
+                {name: 'health bar minimum filled', x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED},
             ],
             might: [
-                {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
+                {name: 'on fire bar maximum not filled', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
             ],
             nextScreens: {
@@ -150,10 +151,10 @@ export class ScreenDetectionService {
         },
         matchNoPrimary: {
             should: [
-                {x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED}
+                {name: 'health bar minimum filled', x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED}
             ],
             might: [
-                {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
+                {name: 'on fire bar maximum empty', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
             ],
             nextScreens: {
@@ -163,15 +164,15 @@ export class ScreenDetectionService {
         },
         matchDead: {
             must: [
-                {x: 270, y: 966, color: MATCH_HEALTH_BAR_EMPTY},
+                {name: 'health bar minimum empty', x: 270, y: 966, color: MATCH_HEALTH_BAR_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
             ],
             should: [
-                {x: 10, y: 10, color: MATCH_DEAD_BLOOD_UL},
-                {x: 1910, y: 1070, color: MATCH_DEAD_BLOOD_LR},
+                {name: 'blood ul', x: 10, y: 10, color: MATCH_DEAD_BLOOD_UL},
+                {name: 'blood lr', x: 1910, y: 1070, color: MATCH_DEAD_BLOOD_LR},
             ],
             might: [
-                {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
+                {name: 'on fire bar maximum empty', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
             ],
             nextScreens: {
                 killcam: 1,
@@ -181,13 +182,13 @@ export class ScreenDetectionService {
         },
         killcam: {
             must: [
-                {x: 400, y: 828, color: KILLCAM_WHITE_BORDER_BOTTOM},
-                {x: 1970, y: 827, color: KILLCAM_WHITE_BORDER_BOTTOM},
-                {x: 1800, y: 40, color: KILLCAM_WHITE_BORDER_COUNTDOWN},
-                {x: 1860, y: 90, color: KILLCAM_WHITE_BORDER_COUNTDOWN},
-                {x: 200, y: 970, color: KILLCAM_DARK_OVERLAY_BOTTOM},
-                {x: 1800, y: 900, color: KILLCAM_DARK_OVERLAY_BOTTOM},
-                {x: 300, y: 300, color: KILLCAM_DARK_GLBOAL_OVERLAY},
+                {name: 'white border bottom l', x: 400, y: 828, color: KILLCAM_WHITE_BORDER_BOTTOM},
+                {name: 'white border bottom r', x: 1970, y: 827, color: KILLCAM_WHITE_BORDER_BOTTOM},
+                {name: 'countdown border ul', x: 1800, y: 40, color: KILLCAM_WHITE_BORDER_COUNTDOWN},
+                {name: 'countdown border lr', x: 1860, y: 90, color: KILLCAM_WHITE_BORDER_COUNTDOWN},
+                {name: 'dark oberlay bottom ll', x: 200, y: 970, color: KILLCAM_DARK_OVERLAY_BOTTOM},
+                {name: 'dark oberlay bottom ur', x: 1800, y: 900, color: KILLCAM_DARK_OVERLAY_BOTTOM},
+                {name: 'dark global overlay', x: 300, y: 300, color: KILLCAM_DARK_GLBOAL_OVERLAY},
                 ...DARK_OVERLAY_TOP
             ],
             nextScreens: {
@@ -198,12 +199,12 @@ export class ScreenDetectionService {
         },
         deadSpectating: {
             must: [
-                {x: 270, y: 966, color: MATCH_HEALTH_BAR_EMPTY},
+                {name: 'health bar minimum empty', x: 270, y: 966, color: MATCH_HEALTH_BAR_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
                 ...DARK_OVERLAY_TOP
             ],
             should: [
-                {x: 1836, y: 18, color: SPECTATE_RESPAWN_COUNTDOWN_BORDER},
+                {name: 'respawn countdown border', x: 1836, y: 18, color: SPECTATE_RESPAWN_COUNTDOWN_BORDER},
             ],
             nextScreens: {
                 matchAlive: 1,
@@ -216,10 +217,10 @@ export class ScreenDetectionService {
             ],
             should: [
                 ...IN_GAME_RETICLE,
-                {x: 270, y: 966, color: MATCH_HEALTH_BAR_FILLED},
+                {name: 'health bar minimum filled', x : 270, y: 966, color: MATCH_HEALTH_BAR_FILLED},
             ],
             might: [
-                {x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
+                {name: 'on fire bar maximum empty', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
             ],
             nextScreens: {
@@ -228,15 +229,15 @@ export class ScreenDetectionService {
         },
         scoreBoard: {
             must: [
-                {x: 160, y: 15, color: SCORE_BOARD_TOP_BOTTOM_BG},
-                {x: 1500, y: 70, color: SCORE_BOARD_TOP_BOTTOM_BG},
-                {x: 960, y: 1050, color: SCORE_BOARD_TOP_BOTTOM_BG},
-                {x: 300, y: 300, color: SCORE_BOARD_GLOBAL_OVERLAY},
-                {x: 1600, y: 600, color: SCORE_BOARD_GLOBAL_OVERLAY},
-                {x: 500, y: 459, color: SCORE_BOARD_LINES},
-                {x: 1400, y: 460, color: SCORE_BOARD_LINES},
-                {x: 963, y: 1010, color: SCORE_BOARD_LINES},
-                {x: 42, y: 50, color: SCORE_BOARD_MODE_LINES},
+                {name: 'top bg ul', x: 160, y: 15, color: SCORE_BOARD_TOP_BOTTOM_BG},
+                {name: 'top bg lr', x: 1500, y: 70, color: SCORE_BOARD_TOP_BOTTOM_BG},
+                {name: 'bottom bg', x: 960, y: 1050, color: SCORE_BOARD_TOP_BOTTOM_BG},
+                {name: 'global overlay ul', x: 300, y: 300, color: SCORE_BOARD_GLOBAL_OVERLAY},
+                {name: 'global overlay lr', x: 1600, y: 600, color: SCORE_BOARD_GLOBAL_OVERLAY},
+                {name: 'line center l', x: 500, y: 459, color: SCORE_BOARD_LINES},
+                {name: 'line center r', x: 1400, y: 460, color: SCORE_BOARD_LINES},
+                {name: 'line bottom', x: 963, y: 1010, color: SCORE_BOARD_LINES},
+                {name: 'line top', x: 42, y: 50, color: SCORE_BOARD_MODE_LINES},
             ],
             nextScreens: {
                 matchAlive: 1,
@@ -248,14 +249,14 @@ export class ScreenDetectionService {
         },
         interactionMenu: {
             must: [
-                {x: 885, y: 485, color: INTERACTION_MENU_OUTER_CIRCLE},
-                {x: 1030, y: 600, color: INTERACTION_MENU_OUTER_CIRCLE},
+                {name: 'outer circle ul', x: 885, y: 485, color: INTERACTION_MENU_OUTER_CIRCLE},
+                {name: 'outer circle lr', x: 1030, y: 600, color: INTERACTION_MENU_OUTER_CIRCLE},
             ],
             should: [
-                {x: 10, y: 10, color: INTERACTION_MENU_OVERLAY},
-                {x: 1910, y: 1070, color: INTERACTION_MENU_OVERLAY},
-                {x: 1500, y: 70, color: INTERACTION_MENU_OVERLAY},
-                {x: 261, y: 966, color: INTERACTION_MENU_OVERLAY},
+                {name: 'overlay ul', x: 10, y: 10, color: INTERACTION_MENU_OVERLAY},
+                {name: 'overlay lr', x: 1910, y: 1070, color: INTERACTION_MENU_OVERLAY},
+                {name: 'overlay ur', x: 1500, y: 70, color: INTERACTION_MENU_OVERLAY},
+                {name: 'overlay ll', x: 261, y: 966, color: INTERACTION_MENU_OVERLAY},
             ],
             nextScreens: {
                 matchAlive: 1,
@@ -280,82 +281,112 @@ export class ScreenDetectionService {
         // private readonly frameService: FrameService,
         private readonly frameService: ImageDisplayService,
         private readonly colorUtilsService: ColorUtilsService,
+        private readonly colorDifferenceService: ColorDifferenceService,
     ) {
         this.screenNames = Object.keys(this.screens) as ScreenName[];
     }
 
     public getScreen(): Observable<{frame: HTMLCanvasElement, screen: ScreenName}> {
         return this.frameService.getFrame().pipe(
-            map(({frame, expected}) => {
-                // Get all screens and their defined probability based on which was the last screen
-                const screenBaseProbabilities = this.screenNames.reduce(
-                    (prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
-                if (this.lastScreenName) {
-                    const lastScreen = this.screens[this.lastScreenName];
-                    for (const nextScreen of Object.entries(lastScreen.nextScreens)) {
-                        screenBaseProbabilities[nextScreen[0]] = nextScreen[1];
-                    }
-                    screenBaseProbabilities[this.lastScreenName] = 10;
-                }
-                // Sort
-                const screenCheckOrder = Object.entries(screenBaseProbabilities)
-                    .map((probabilityEntry) => ({name: probabilityEntry[0] as ScreenName, probability: probabilityEntry[1]}))
-                    .sort((a, b) => {
-                        // Randomize order of equal ranked screens
-                        return b.probability - a.probability || Math.random() - .5;
-                    })
-                    .map((screenWithProbability) => screenWithProbability.name);
-
-                // Check the first random n possible screens, as long there's at least one with a high probability
-                const screenProbabilities: Array<{name: ScreenName, probability: ScreenProbability}> = [];
-                for (const screen of screenCheckOrder) {
-                    if (screen === 'undefined') {
-                        // "undefined" screens always have the same probability
-                        screenProbabilities.push({name: 'undefined', probability: {probability: .7, confidence: .5}});
-                    } else {
-                        screenProbabilities.push({
-                            name: screen,
-                            probability: this.getScreenProbability(frame, this.screens[screen], screen === this.lastScreenName)
-                        });
-                    }
-
-                    if (
-                        screenProbabilities.some((screenProbability) => screenProbability.probability.probability >= .8) &&
-                        Math.random() > .8
-                    ) {
-                        break;
-                    }
-                }
-
-                // Get the screen with the highest probability (sort by pixel probability, previous screen probability, confidence)
-                const sortedScreens = screenProbabilities.sort((a, b) => {
-                    return b.probability.probability - a.probability.probability ||
-                        screenBaseProbabilities[b.name] - screenBaseProbabilities[a.name] ||
-                        b.probability.confidence - a.probability.confidence;
-                });
-
-                this.lastScreenName = sortedScreens[0].name;
-
-
-                // Testing reliability
-                if (!this.screenNames.includes(expected as ScreenName)) {
-                    expected = 'undefined';
-                }
-                if (!this.reliability.has(expected as ScreenName)) {
-                    this.reliability.set(expected as ScreenName, {correct: 0, incorrect: 0});
-                }
-                const mapEntry = this.reliability.get(expected as ScreenName);
-                if (this.lastScreenName === expected) {
-                    mapEntry.correct++;
-                } else {
-                    mapEntry.incorrect++;
-                }
-                // this.reliability.set(expected as ScreenName, mapEntry);
-                // console.log('Detected screen', this.lastScreenName, expected, this.reliability, sortedScreens);
-
-                return {frame, screen: this.lastScreenName};
-            })
+            map(({frame, expected}) => this.analyzeScreen(frame, expected as ScreenName))
         );
+    }
+
+    public analyzeScreen(frame: HTMLCanvasElement, expected: ScreenName): {frame: HTMLCanvasElement, screen: ScreenName} {
+        // Get all screens and their defined probability based on which was the last screen
+        const screenBaseProbabilities = this.screenNames.reduce(
+            (prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
+        if (this.lastScreenName) {
+            const lastScreen = this.screens[this.lastScreenName];
+            for (const nextScreen of Object.entries(lastScreen.nextScreens)) {
+                screenBaseProbabilities[nextScreen[0]] = nextScreen[1];
+            }
+            screenBaseProbabilities[this.lastScreenName] = 10;
+        }
+        // Sort
+        const screenCheckOrder = Object.entries(screenBaseProbabilities)
+            .map((probabilityEntry) => ({name: probabilityEntry[0] as ScreenName, probability: probabilityEntry[1]}))
+            .sort((a, b) => {
+                // Randomize order of equal ranked screens
+                return b.probability - a.probability || Math.random() - .5;
+            })
+            .map((screenWithProbability) => screenWithProbability.name);
+
+        // Check the first random n possible screens, as long there's at least one with a high probability
+        const screenProbabilities: AnalyzedScreen[] = [];
+        for (const screen of screenCheckOrder) {
+            if (screen === 'undefined') {
+                // "undefined" screens always have the same probability
+                screenProbabilities.push({
+                    name: 'undefined',
+                    probability: {probability: .7, confidence: .5, matchingPoints: []} as ScreenProbability
+                });
+            } else {
+                screenProbabilities.push({
+                    name: screen,
+                    probability: this.getScreenProbability(frame, this.screens[screen], screen === this.lastScreenName)
+                });
+            }
+
+            if (
+                screenProbabilities.some((screenProbability) => screenProbability.probability.probability >= .8) &&
+                Math.random() > .8
+            ) {
+                break;
+            }
+        }
+
+        // Get the screen with the highest probability (sort by pixel probability, previous screen probability, confidence)
+        const sortedScreens = screenProbabilities.sort((a, b) => {
+            return b.probability.probability - a.probability.probability ||
+                screenBaseProbabilities[b.name] - screenBaseProbabilities[a.name] ||
+                b.probability.confidence - a.probability.confidence;
+        });
+        const probableScreen = sortedScreens[0];
+
+        this.lastScreenName = probableScreen.name;
+
+
+        // Compare with expected screen
+        this.log(frame, probableScreen, expected);
+
+        // console.log('Detected screen', this.lastScreenName, expected, this.reliability, sortedScreens);
+
+        return {frame, screen: this.lastScreenName};
+    }
+
+    private log(frame: HTMLCanvasElement, actual: AnalyzedScreen, expected: ScreenName): void {
+        if (!this.screenNames.includes(expected)) {
+            expected = 'undefined';
+        }
+        if (!this.reliability.has(expected)) {
+            this.reliability.set(expected, {correct: 0, incorrect: 0});
+        }
+        const mapEntry = this.reliability.get(expected);
+        if (this.lastScreenName === expected) {
+            mapEntry.correct++;
+        } else {
+            mapEntry.incorrect++;
+            console.groupCollapsed('Didn\'t expect screen. Expected:', expected, 'Actual:', actual.name);
+            const expectedScreenPoints = this.getScreenPoints(expected);
+            const incorrectPoints = expectedScreenPoints.filter(
+                (point) => !this.colorUtilsService.pixelIsColor(frame, point, point.color));
+            console.group(
+                `${incorrectPoints.length} of ${expectedScreenPoints.length} points DON'T match of expected screen "${expected}"`
+            );
+            for (const point of incorrectPoints) {
+                const actualColor = this.colorUtilsService.getPixelColor(frame, point);
+                console.log(
+                    `Point "${point.name}" ${point.importance} be different. Color diff:`,
+                    this.colorDifferenceService.getColorDifference(actualColor, point.color)
+                );
+            }
+            console.groupEnd();
+            // Find out why actual matched better
+            const actualScreenPoints = this.getScreenPoints(actual.name);
+            console.log(`Detected as ${actual.name} since ${actual.probability.matchingPoints.length} of ${actualScreenPoints.length} points match`);
+            console.groupEnd();
+        }
     }
 
     private previousForgivenesses: Array<{x: number, y: number, timesForgiven: number}> = [];
@@ -382,8 +413,14 @@ export class ScreenDetectionService {
             this.previousForgivenesses = [];
         }
 
+        const matchingPoints: Array<{point: ScreenPoint, forgiven: boolean}> = [];
+
         const sum = points.reduce((prev, curr) => {
             let pixelIsColor = this.colorUtilsService.pixelIsColor(frame, curr.colorPosition, curr.colorPosition.color);
+
+            if (pixelIsColor) {
+                matchingPoints.push({point: curr.colorPosition, forgiven: false});
+            }
 
             // "should" and "might" values are allowed to not be the correct color for 1 or 2 detections
             if (!pixelIsColor && isCurrentScreen && curr.maxForgivness > 0) {
@@ -393,6 +430,7 @@ export class ScreenDetectionService {
                 const newTimesForgiven = previousForgivenessForPixel?.timesForgiven + 1 || 1;
                 if (newTimesForgiven <= curr.maxForgivness) {
                     pixelIsColor = true;
+                    matchingPoints.push({point: curr.colorPosition, forgiven: true});
                     this.previousForgivenesses.push({x: curr.colorPosition.x, y: curr.colorPosition.y, timesForgiven: newTimesForgiven});
                 }
             }
@@ -413,22 +451,41 @@ export class ScreenDetectionService {
             const color = point.colorPosition.color;
             return color.r + color.g + color.b;
         }).filter((color) => color === 0 || color === 255 * 3).length;
-        const confidence = sumMax * forgivenValuesFactor * transparencyFactor * colorFactor / points.length;
+        // Decrease for low number of checked points
+        const checksFactor = .95 ** (10 - points.length);
+        const confidence = sumMax * forgivenValuesFactor * transparencyFactor * colorFactor * checksFactor;
 
-        return {probability, confidence};
+        return {probability, confidence, matchingPoints};
+    }
+
+    private getScreenPoints(screenName: ScreenName): Array<ScreenPoint & {importance: 'must' | 'should' | 'might'}> {
+        const screen = this.screens[screenName];
+        return [
+            ...(screen.must || []).map((point) => ({...point, importance: 'must' as const})),
+            ...(screen.should || []).map((point) => ({...point, importance: 'should' as const})),
+            ...(screen.might || []).map((point) => ({...point, importance: 'might' as const})),
+        ];
     }
 }
 
 type ScreensModel = Record<ScreenName, Screen>;
 
+type ScreenPoint = ColorRGBAPosition & {name: string};
+
 interface Screen {
-    must?: ColorRGBAPosition[];
-    should?: ColorRGBAPosition[];
-    might?: ColorRGBAPosition[];
+    must?: ScreenPoint[];
+    should?: ScreenPoint[];
+    might?: ScreenPoint[];
     nextScreens: Partial<Record<ScreenName, number>>;
+}
+
+interface AnalyzedScreen {
+    name: ScreenName;
+    probability: ScreenProbability;
 }
 
 interface ScreenProbability {
     probability: number;
     confidence: number;
+    matchingPoints: Array<{point: ScreenPoint, forgiven: boolean}>;
 }

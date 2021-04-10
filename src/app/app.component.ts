@@ -17,16 +17,14 @@ const FRAME_RATE = 10;
 })
 export class AppComponent implements OnInit {
 
+    @ViewChild('expectedScreen')
+    private expectedScreenElement: ElementRef<HTMLInputElement>;
+
     @ViewChild('video')
     private videoElement: ElementRef<HTMLVideoElement>;
 
     @ViewChild('videoTest')
     public videoTestElement: ElementRef<HTMLVideoElement>;
-
-    @ViewChild('videoDescribe')
-    public videoDescribeElement: ElementRef<HTMLVideoElement>;
-    @ViewChild('videoDescription')
-    public videoDescriptionElement: ElementRef<HTMLTextAreaElement>;
 
     public constructor(
         private readonly colorUtilsService: ColorUtilsService,
@@ -41,8 +39,7 @@ export class AppComponent implements OnInit {
     public ngOnInit(): void {
     }
 
-
-    public async onStart(): Promise<void> {
+    public async onStartVideo(): Promise<void> {
         // Get video stream
         this.videoElement.nativeElement.srcObject = await (navigator.mediaDevices as any).getDisplayMedia({
             video: {
@@ -59,20 +56,23 @@ export class AppComponent implements OnInit {
         });
 
         this.frameService.setup(this.videoElement.nativeElement);
+    }
 
+    public onStartAnalyze(): void {
         this.gameService.start();
     }
 
-    public onAnalyze(): void {
-        // this.frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
-        // this.colorUtilsService.resetCache();
+    public onAnalyzeFrame(): void {
+        const frame = document.createElement('canvas');
+        frame.width = this.videoElement.nativeElement.videoWidth;
+        frame.height = this.videoElement.nativeElement.videoHeight;
+        const frameContext = frame.getContext('2d');
 
-        // console.log(this.onFireDetectionService.getOnFireLevel(this.frame));
+        frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
 
-        // @ts-ignore
-        // console.log(this.screenDetectionService.getScreenProbability(this.frame, this.screenDetectionService.screens.matchAlive));
-        // this.screenDetectionService.getScreen(this.frame);
-        // this.colorUtilsService.pixelIsColor(this.frame, {x: 1910, y: 1070}, {r: 215, g: 0, b: 5, a: 0.7});
+        this.colorUtilsService.resetCache();
+        const result = this.screenDetectionService.analyzeScreen(frame, this.expectedScreenElement.nativeElement.value as any);
+        console.log('analysis result', result);
     }
 
     public onChangeTestVideo(files: FileList): void {
@@ -95,22 +95,5 @@ export class AppComponent implements OnInit {
             this.imageDisplayService.setDescription(reader.result.toString());
         };
         reader.readAsText(files[0]);
-    }
-
-    public onChangeDescribeVideo(files: FileList): void {
-        this.videoDescribeElement.nativeElement.src = URL.createObjectURL(files[0]);
-    }
-
-    public onDescribeVideoMove(milliseconds: number): void {
-        this.videoDescribeElement.nativeElement.currentTime += milliseconds / 1000;
-    }
-
-    public onDescribeVideoSpeed(speed: number): void {
-        this.videoDescribeElement.nativeElement.playbackRate = speed;
-    }
-
-    public onDescribeVideoMark(): void {
-        this.videoDescriptionElement.nativeElement.value += `\n${this.videoDescribeElement.nativeElement.currentTime}\t`;
-        this.videoDescriptionElement.nativeElement.focus();
     }
 }

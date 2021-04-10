@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ColorDifferenceService } from '../color-difference.service';
 
 @Component({
     selector: 'app-is-color-calculator',
@@ -8,11 +9,12 @@ import { FormBuilder } from '@angular/forms';
 })
 export class IsColorCalculatorComponent implements OnInit {
 
-    public form;
+    public form: FormGroup;
     public result: string;
 
     constructor(
-        private formBuilder: FormBuilder
+        private formBuilder: FormBuilder,
+        private readonly colorDifferenceService: ColorDifferenceService,
     ) {
         this.form = this.formBuilder.group({
             test: '',
@@ -31,38 +33,7 @@ export class IsColorCalculatorComponent implements OnInit {
         const {r, g, b, a} = formdata;
         const compareColor = {r, g, b, a: a.replace(',', '.')};
 
-        const alpha = compareColor.a - 0.1;
-        const tolerance = 10;
-
-        const isColor = (
-            visibleColor.r + tolerance >= compareColor.r * alpha &&
-            visibleColor.r - tolerance <= compareColor.r * alpha + 255 * (1 - alpha) &&
-            visibleColor.g + tolerance >= compareColor.g * alpha &&
-            visibleColor.g - tolerance <= compareColor.g * alpha + 255 * (1 - alpha) &&
-            visibleColor.b + tolerance >= compareColor.b * alpha &&
-            visibleColor.b - tolerance <= compareColor.b * alpha + 255 * (1 - alpha)
-        );
-
-        this.result = isColor ? 'is color!' : 'is NOT color!';
-
-        if (!(
-            visibleColor.r + tolerance >= compareColor.r * alpha &&
-            visibleColor.r - tolerance <= compareColor.r * alpha + 255 * (1 - alpha)
-        )) {
-            this.result += ` RED wrong (${compareColor.r * alpha} < ${visibleColor.r}±${tolerance} < ${compareColor.r * alpha + 255 * (1 - alpha)})`;
-        }
-        if (!(
-            visibleColor.g + tolerance >= compareColor.g * alpha &&
-            visibleColor.g - tolerance <= compareColor.g * alpha + 255 * (1 - alpha)
-        )) {
-            this.result += ` GREEN wrong (${compareColor.g * alpha} < ${visibleColor.g}±${tolerance} < ${compareColor.g * alpha + 255 * (1 - alpha)})`;
-        }
-        if (!(
-            visibleColor.b + tolerance >= compareColor.b * alpha &&
-            visibleColor.b - tolerance <= compareColor.b * alpha + 255 * (1 - alpha)
-        )) {
-            this.result += ` BLUE wrong (${compareColor.b * alpha} < ${visibleColor.b}±${tolerance} < ${compareColor.b * alpha + 255 * (1 - alpha)})`;
-        }
+        this.result = this.colorDifferenceService.getColorDifference(visibleColor, compareColor);
     }
 
     private hexToRgb(hex: string): {r: number, g: number, b: number} {
