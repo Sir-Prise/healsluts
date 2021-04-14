@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
         private readonly frameService: FrameService,
         private readonly screenDetectionService: ScreenDetectionService,
         private readonly onFireDetectionService: OnFireDetectionService,
-        private readonly gameService: GameService,
+        public readonly gameService: GameService,
         public readonly imageDisplayService: ImageDisplayService,
     ) {
     }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, tap } from 'rxjs/operators';
 import { Position } from '../model/position.model';
 import { ColorUtilsService } from '../utils/color-utils.service';
 import { FrameService } from './frame.service';

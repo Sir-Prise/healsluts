@@ -278,8 +278,8 @@ export class ScreenDetectionService {
     public reliability = new Map<ScreenName, {correct: number, incorrect: number}>();
 
     public constructor(
-        // private readonly frameService: FrameService,
-        private readonly frameService: ImageDisplayService,
+        private readonly frameService: FrameService,
+        // private readonly frameService: ImageDisplayService,
         private readonly colorUtilsService: ColorUtilsService,
         private readonly colorDifferenceService: ColorDifferenceService,
     ) {
@@ -301,7 +301,7 @@ export class ScreenDetectionService {
             for (const nextScreen of Object.entries(lastScreen.nextScreens)) {
                 screenBaseProbabilities[nextScreen[0]] = nextScreen[1];
             }
-            screenBaseProbabilities[this.lastScreenName] = 10;
+            screenBaseProbabilities[this.lastScreenName] = 1.3;
         }
         // Sort
         const screenCheckOrder = Object.entries(screenBaseProbabilities)
@@ -339,8 +339,7 @@ export class ScreenDetectionService {
         // Get the screen with the highest probability (sort by pixel probability, previous screen probability, confidence)
         const sortedScreens = screenProbabilities.sort((a, b) => {
             return b.probability.probability - a.probability.probability ||
-                screenBaseProbabilities[b.name] - screenBaseProbabilities[a.name] ||
-                b.probability.confidence - a.probability.confidence;
+                screenBaseProbabilities[b.name] * b.probability.confidence - screenBaseProbabilities[a.name] * a.probability.confidence;
         });
         const probableScreen = sortedScreens[0];
 
@@ -348,7 +347,7 @@ export class ScreenDetectionService {
 
 
         // Compare with expected screen
-        this.log(frame, probableScreen, expected);
+        // this.log(frame, probableScreen, expected);
 
         // console.log('Detected screen', this.lastScreenName, expected, this.reliability, sortedScreens);
 

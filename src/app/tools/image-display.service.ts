@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { interval, Observable, Subject } from 'rxjs';
 import { filter, map, takeUntil, throttleTime } from 'rxjs/operators';
+import { IFrameService } from '../model/frame-service.interface';
 import { ColorUtilsService } from '../utils/color-utils.service';
 
 @Injectable({
     providedIn: 'root'
 })
-export class ImageDisplayService {
+export class ImageDisplayService implements IFrameService {
 
     private frames$: Observable<{frame: HTMLCanvasElement, expected: string}>;
 

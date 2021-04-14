@@ -3,11 +3,12 @@ import { interval, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { ColorUtilsService } from '../utils/color-utils.service';
 import { LoopService } from './loop.service';
+import { IFrameService } from '../model/frame-service.interface';
 
 @Injectable({
     providedIn: 'root'
 })
-export class FrameService {
+export class FrameService implements IFrameService {
     private videoElement: HTMLVideoElement;
     private frame: HTMLCanvasElement;
     private frameContext: CanvasRenderingContext2D;
@@ -28,12 +29,12 @@ export class FrameService {
         this.frameContext = this.frame.getContext('2d');
     }
 
-    public getFrame(): Observable<HTMLCanvasElement> {
+    public getFrame(): Observable<{frame: HTMLCanvasElement, expected?: never}> {
         return this.loopService.getInterval().pipe(
             map(() => {
                 this.colorUtilsService.resetCache();
                 this.frameContext.drawImage(this.videoElement, 0, 0);
-                return this.frame;
+                return {frame: this.frame};
             })
         );
     }
