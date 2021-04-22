@@ -4,6 +4,8 @@ import { ColorRGBA } from '../model/color-rgba.model';
 import { Color } from '../model/color.model';
 import { Position } from '../model/position.model';
 
+const MAX_CONTRAST = 255 * 3;
+
 @Injectable({
     providedIn: 'root'
 })
@@ -75,6 +77,18 @@ export class ColorUtilsService {
         // );
 
         return this.isColor(this.getPixelColor(frame, position), color);
+    }
+
+    /**
+     * Gets the difference between to colors.
+     *
+     * @returns A value between 0 (no difference) and 1 (black + white)
+     */
+    public getContrast(frame: HTMLCanvasElement, positionA: Position, positionB: Position): number {
+        const aColor = this.getPixelColor(frame, positionA);
+        const bColor = this.getPixelColor(frame, positionB);
+        const diff = Math.abs(aColor.r - bColor.r) + Math.abs(aColor.g - bColor.g) + Math.abs(aColor.b - bColor.b);
+        return diff / MAX_CONTRAST;
     }
 
     public resetCache(): void {

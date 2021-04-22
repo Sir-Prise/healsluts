@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ColorRGBAPosition } from '../model/color-rgba-position.model';
+import { Position } from '../model/position.model';
 import { ColorDifferenceService } from '../tools/color-difference.service';
 import { ImageDisplayService } from '../tools/image-display.service';
 import { ColorUtilsService } from '../utils/color-utils.service';
@@ -46,10 +47,10 @@ const IN_GAME_ON_FIRE_MAX_MARKER = {r: 255, g: 255, b: 255, a: 0.79};
 
 // Common color positions
 const DARK_OVERLAY_TOP = [
-    {name: 'dark overlay top border ul', x: 200, y: 126, color: DARK_OVERLAY_TOP_BORDER},
-    {name: 'dark overlay top ur', x: 1800, y: 127, color: DARK_OVERLAY_TOP_BORDER},
-    {name: 'dark overlay top bg ul', x: 120, y: 115, color: DARK_OVERLAY_TOP_BG},
-    {name: 'dark overlay top bg ur', x: 1700, y: 25, color: DARK_OVERLAY_TOP_BG},
+    {name: 'dark overlay top bg ul', x: 200, y: 115, color: DARK_OVERLAY_TOP_BG, contrast: {x: 200, y: 140}},
+    {name: 'dark overlay top border ul', x: 200, y: 126, color: DARK_OVERLAY_TOP_BORDER, contrast: {x: 200, y: 115}},
+    {name: 'dark overlay top bg ur', x: 1800, y: 25, color: DARK_OVERLAY_TOP_BG, contrast: {x: 1800, y: 127}},
+    {name: 'dark overlay top border ur', x: 1800, y: 127, color: DARK_OVERLAY_TOP_BORDER, contrast: {x: 1800, y: 140}},
 ];
 const IN_GAME_RETICLE = [
     // Currently, browsers always capture the cursor which overlays the reticle, so I picked a visible corner, not the center
@@ -79,6 +80,7 @@ type ScreenName = 'menues' | 'alertPopup' | 'loadingMap' | 'heroSelection' | 'ma
 export class ScreenDetectionService {
     private readonly screens: ScreensModel = {
         menues: {
+            name: 'menues',
             must: [
                 {name: 'add friend button ul', x: 1454, y: 39, color: MENUES_ADD_FRIEND_BTN_BG},
                 {name: 'add friend button lr', x: 1494, y: 80, color: MENUES_ADD_FRIEND_BTN_BG},
@@ -95,6 +97,7 @@ export class ScreenDetectionService {
             }
         },
         alertPopup: {
+            name: 'alertPopup',
             must: [
                 {name: 'bg ul', x: 300, y: 200, color: ALERT_POPUP_BG},
                 {name: 'bg lr', x: 1400, y: 1000, color: ALERT_POPUP_BG},
@@ -108,6 +111,7 @@ export class ScreenDetectionService {
             }
         },
         loadingMap: {
+            name: 'loadingMap',
             must: [
                 {name: 'overwatch logo ul', x: 1750, y: 940, color: LOADING_MAP_OVERWATCH_LOGO},
                 {name: 'overwatch logo lr', x: 1800, y: 980, color: LOADING_MAP_OVERWATCH_LOGO},
@@ -119,6 +123,7 @@ export class ScreenDetectionService {
             }
         },
         heroSelection: {
+            name: 'heroSelection',
             must: [
                 {name: 'skin bg ul', x: 1425, y: 220, color: HERO_SELECTION_SKIN_BG},
                 {name: 'skin bg lr', x: 1800, y: 230, color: HERO_SELECTION_SKIN_BG},
@@ -132,6 +137,7 @@ export class ScreenDetectionService {
             }
         },
         matchAlive: {
+            name: 'matchAlive',
             should: [
                 ...IN_GAME_RETICLE, // Can't be "must", because the red kill icon overlays the reticle
                 {name: 'health bar minimum filled', x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED},
@@ -150,6 +156,7 @@ export class ScreenDetectionService {
             }
         },
         matchNoPrimary: {
+            name: 'matchNoPrimary',
             should: [
                 {name: 'health bar minimum filled', x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED}
             ],
@@ -163,13 +170,14 @@ export class ScreenDetectionService {
             }
         },
         matchDead: {
+            name: 'matchDead',
             must: [
                 {name: 'health bar minimum empty', x: 270, y: 966, color: MATCH_HEALTH_BAR_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
             ],
             should: [
-                {name: 'blood ul', x: 10, y: 10, color: MATCH_DEAD_BLOOD_UL},
-                {name: 'blood lr', x: 1910, y: 1070, color: MATCH_DEAD_BLOOD_LR},
+                {name: 'blood ul', x: 10, y: 10, color: MATCH_DEAD_BLOOD_UL, contrast: {x: 130, y: 130}},
+                {name: 'blood lr', x: 1910, y: 1070, color: MATCH_DEAD_BLOOD_LR, contrast: {x: 1790, y: 950}},
             ],
             might: [
                 {name: 'on fire bar maximum empty', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
@@ -181,6 +189,7 @@ export class ScreenDetectionService {
             }
         },
         killcam: {
+            name: 'killcam',
             must: [
                 {name: 'white border bottom l', x: 400, y: 828, color: KILLCAM_WHITE_BORDER_BOTTOM},
                 {name: 'white border bottom r', x: 1970, y: 827, color: KILLCAM_WHITE_BORDER_BOTTOM},
@@ -189,7 +198,11 @@ export class ScreenDetectionService {
                 {name: 'dark oberlay bottom ll', x: 200, y: 970, color: KILLCAM_DARK_OVERLAY_BOTTOM},
                 {name: 'dark oberlay bottom ur', x: 1800, y: 900, color: KILLCAM_DARK_OVERLAY_BOTTOM},
                 {name: 'dark global overlay', x: 300, y: 300, color: KILLCAM_DARK_GLBOAL_OVERLAY},
-                ...DARK_OVERLAY_TOP
+                // Same as "DARK_OVERLAY" constant but without contrast:
+                {name: 'dark overlay top border ul', x: 200, y: 126, color: DARK_OVERLAY_TOP_BORDER},
+                {name: 'dark overlay top ur', x: 1800, y: 127, color: DARK_OVERLAY_TOP_BORDER},
+                {name: 'dark overlay top bg ul', x: 120, y: 115, color: DARK_OVERLAY_TOP_BG},
+                {name: 'dark overlay top bg ur', x: 1700, y: 25, color: DARK_OVERLAY_TOP_BG},
             ],
             nextScreens: {
                 deadSpectating: .9,
@@ -198,6 +211,7 @@ export class ScreenDetectionService {
             }
         },
         deadSpectating: {
+            name: 'deadSpectating',
             must: [
                 {name: 'health bar minimum empty', x: 270, y: 966, color: MATCH_HEALTH_BAR_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
@@ -212,6 +226,7 @@ export class ScreenDetectionService {
             }
         },
         potgSpectating: {
+            name: 'potgSpectating',
             must: [
                 ...DARK_OVERLAY_TOP
             ],
@@ -220,14 +235,13 @@ export class ScreenDetectionService {
                 {name: 'health bar minimum filled', x : 270, y: 966, color: MATCH_HEALTH_BAR_FILLED},
             ],
             might: [
-                {name: 'on fire bar maximum empty', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
-                ...IN_GAME_ON_FIRE_ICONS,
             ],
             nextScreens: {
                 undefined: 1,
             }
         },
         scoreBoard: {
+            name: 'scoreBoard',
             must: [
                 {name: 'top bg ul', x: 160, y: 15, color: SCORE_BOARD_TOP_BOTTOM_BG},
                 {name: 'top bg lr', x: 1500, y: 70, color: SCORE_BOARD_TOP_BOTTOM_BG},
@@ -248,6 +262,7 @@ export class ScreenDetectionService {
             }
         },
         interactionMenu: {
+            name: 'interactionMenu',
             must: [
                 {name: 'outer circle ul', x: 885, y: 485, color: INTERACTION_MENU_OUTER_CIRCLE},
                 {name: 'outer circle lr', x: 1030, y: 600, color: INTERACTION_MENU_OUTER_CIRCLE},
@@ -264,6 +279,7 @@ export class ScreenDetectionService {
             }
         },
         undefined: {
+            name: 'undefined',
             // Default screen for not yet defined screens
             // might: [{x: 10, y: 10, color: {r: 0, g: 0, b: 0, a: 0}}],
             nextScreens: {
@@ -292,7 +308,7 @@ export class ScreenDetectionService {
         );
     }
 
-    public analyzeScreen(frame: HTMLCanvasElement, expected: ScreenName): {frame: HTMLCanvasElement, screen: ScreenName} {
+    public analyzeScreen(frame: HTMLCanvasElement, expected?: ScreenName): {frame: HTMLCanvasElement, screen: ScreenName} {
         // Get all screens and their defined probability based on which was the last screen
         const screenBaseProbabilities = this.screenNames.reduce(
             (prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
@@ -345,47 +361,64 @@ export class ScreenDetectionService {
 
         this.lastScreenName = probableScreen.name;
 
+        this.log(frame, probableScreen, expected, sortedScreens);
 
-        // Compare with expected screen
-        // this.log(frame, probableScreen, expected);
-
-        // console.log('Detected screen', this.lastScreenName, expected, this.reliability, sortedScreens);
+        console.log('Detected screen', this.lastScreenName, sortedScreens);
 
         return {frame, screen: this.lastScreenName};
     }
 
-    private log(frame: HTMLCanvasElement, actual: AnalyzedScreen, expected: ScreenName): void {
-        if (!this.screenNames.includes(expected)) {
-            expected = 'undefined';
+    private log(frame: HTMLCanvasElement, actual: AnalyzedScreen, expectedName: ScreenName, sortedScreens: AnalyzedScreen[]): void {
+        if (!this.screenNames.includes(expectedName)) {
+            expectedName = 'undefined';
         }
-        if (!this.reliability.has(expected)) {
-            this.reliability.set(expected, {correct: 0, incorrect: 0});
+        if (!this.reliability.has(expectedName)) {
+            this.reliability.set(expectedName, {correct: 0, incorrect: 0});
         }
-        const mapEntry = this.reliability.get(expected);
-        if (this.lastScreenName === expected) {
+        const mapEntry = this.reliability.get(expectedName);
+        if (this.lastScreenName === expectedName) {
             mapEntry.correct++;
+            return;
+        }
+
+        // Incorrect screen
+        mapEntry.incorrect++;
+        console.groupCollapsed('Didn\'t expect screen. Expected:', expectedName, 'Actual:', actual.name);
+
+        // Analyze expected screen
+        let expected = sortedScreens.find((screen) => screen.name === expectedName);
+        if (!expected) {
+            expected = {
+                name: expectedName,
+                probability: this.getScreenProbability(frame, this.screens[expectedName], false)
+            };
+        }
+
+        const expectedScreenPoints = this.getScreenPoints(expectedName);
+        const expectedIncorrectPoints = expectedScreenPoints.filter(
+            (point) => !this.colorUtilsService.pixelIsColor(frame, point, point.color));
+        const actualScreenPoints = this.getScreenPoints(actual.name);
+
+        if (actualScreenPoints.length === actual.probability.matchingPoints.length &&
+             expectedScreenPoints.length === expected.probability.matchingPoints.length
+        ) {
+            console.log('Actual and expected screen both match all points.');
+
         } else {
-            mapEntry.incorrect++;
-            console.groupCollapsed('Didn\'t expect screen. Expected:', expected, 'Actual:', actual.name);
-            const expectedScreenPoints = this.getScreenPoints(expected);
-            const incorrectPoints = expectedScreenPoints.filter(
-                (point) => !this.colorUtilsService.pixelIsColor(frame, point, point.color));
             console.group(
-                `${incorrectPoints.length} of ${expectedScreenPoints.length} points DON'T match of expected screen "${expected}"`
+                `${expectedIncorrectPoints.length} of ${expectedScreenPoints.length} points (without forgiveness) DON'T match of expected screen "${expectedName}"`
             );
-            for (const point of incorrectPoints) {
+            for (const point of expectedIncorrectPoints) {
                 const actualColor = this.colorUtilsService.getPixelColor(frame, point);
-                console.log(
-                    `Point "${point.name}" ${point.importance} be different. Color diff:`,
-                    this.colorDifferenceService.getColorDifference(actualColor, point.color)
-                );
+                console.log(`Point "${point.name}" (x: ${point.x}, y: ${point.y}) ${point.importance} be different.`);
+                console.log(...this.colorDifferenceService.getColorDifference(actualColor, point.color));
             }
             console.groupEnd();
             // Find out why actual matched better
-            const actualScreenPoints = this.getScreenPoints(actual.name);
             console.log(`Detected as ${actual.name} since ${actual.probability.matchingPoints.length} of ${actualScreenPoints.length} points match`);
-            console.groupEnd();
         }
+
+        console.groupEnd();
     }
 
     private previousForgivenesses: Array<{x: number, y: number, timesForgiven: number}> = [];
@@ -413,6 +446,7 @@ export class ScreenDetectionService {
         }
 
         const matchingPoints: Array<{point: ScreenPoint, forgiven: boolean}> = [];
+        let matchingLowContrastCount = 0;
 
         const sum = points.reduce((prev, curr) => {
             let pixelIsColor = this.colorUtilsService.pixelIsColor(frame, curr.colorPosition, curr.colorPosition.color);
@@ -434,6 +468,14 @@ export class ScreenDetectionService {
                 }
             }
 
+            // Check for matching points if contrast to neighboring points is high enough
+            if (pixelIsColor && curr.colorPosition.contrast) {
+                if (this.colorUtilsService.getContrast(frame, curr.colorPosition, curr.colorPosition.contrast) < 0.15) {
+                    matchingLowContrastCount++;
+                }
+
+            }
+
             return prev + (pixelIsColor ? curr.factor : 0);
         }, 0);
 
@@ -446,13 +488,17 @@ export class ScreenDetectionService {
         // Decrease for colors with high transparency
         const transparencyFactor = .8 ** points.filter((point) => point.colorPosition.color.a < .5).length;
         // Decrease for black + white
-        const colorFactor = .9 ** points.map((point) => {
+        const colorFactor = .95 ** points.map((point) => {
             const color = point.colorPosition.color;
             return color.r + color.g + color.b;
         }).filter((color) => color === 0 || color === 255 * 3).length;
         // Decrease for low number of checked points
-        const checksFactor = .95 ** (10 - points.length);
-        const confidence = sumMax * forgivenValuesFactor * transparencyFactor * colorFactor * checksFactor;
+        const checksFactor = .95 ** (10 - points.length + matchingLowContrastCount);
+        // Extra decrease for low contrast
+        const lowContrastFactor = .9 ** matchingLowContrastCount;
+        const confidence = sumMax * forgivenValuesFactor * transparencyFactor * colorFactor * checksFactor * lowContrastFactor;
+        // console.log(`confidence for ${screen.name}:`, `confidence: ${confidence}`, `sumMax: ${sumMax}`, `forgivenValuesFactor: ${forgivenValuesFactor}`,
+        // `transparencyFactor: ${transparencyFactor}`, `colorFactor: ${colorFactor}`, `checksFactor: ${checksFactor}`, `matchingLowContrastCount: ${matchingLowContrastCount}`);
 
         return {probability, confidence, matchingPoints};
     }
@@ -469,9 +515,10 @@ export class ScreenDetectionService {
 
 type ScreensModel = Record<ScreenName, Screen>;
 
-type ScreenPoint = ColorRGBAPosition & {name: string};
+type ScreenPoint = ColorRGBAPosition & {name: string} & {contrast?: Position};
 
 interface Screen {
+    name: ScreenName;
     must?: ScreenPoint[];
     should?: ScreenPoint[];
     might?: ScreenPoint[];

@@ -15,7 +15,7 @@ export class DeathDetectionService {
     public getDeathState(): Observable<'alive' | 'dead' | undefined> {
         return this.screenDetectionService.getScreen().pipe(
             pluck('screen'),
-            bufferCount(5),
+            bufferCount(10),
             map((lastScreens) => {
                 const lastStates = lastScreens
                     // filter scoreBoard as this can mean alive or dead (aka Schrödinger's Score Board)

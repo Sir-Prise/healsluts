@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
 
         this.colorUtilsService.resetCache();
         const result = this.screenDetectionService.analyzeScreen(frame, this.expectedScreenElement.nativeElement.value as any);
-        console.log('analysis result', result);
+        // console.log('analysis result', result);
     }
 
     public onChangeTestVideo(files: FileList): void {

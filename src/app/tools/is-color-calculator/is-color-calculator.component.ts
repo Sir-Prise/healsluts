@@ -33,7 +33,7 @@ export class IsColorCalculatorComponent implements OnInit {
         const {r, g, b, a} = formdata;
         const compareColor = {r, g, b, a: a.replace(',', '.')};
 
-        this.result = this.colorDifferenceService.getColorDifference(visibleColor, compareColor);
+        this.result = this.colorDifferenceService.getColorDifference(visibleColor, compareColor)[0].replace('%c', '');
     }
 
     private hexToRgb(hex: string): {r: number, g: number, b: number} {
