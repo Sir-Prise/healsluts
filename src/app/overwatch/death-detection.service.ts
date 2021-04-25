@@ -8,6 +8,8 @@ import { ScreenDetectionService } from './screen-detection.service';
 })
 export class DeathDetectionService {
 
+    private lastState: 'alive' | 'dead' | undefined;
+
     constructor(
         private readonly screenDetectionService: ScreenDetectionService
     ) { }
@@ -15,7 +17,7 @@ export class DeathDetectionService {
     public getDeathState(): Observable<'alive' | 'dead' | undefined> {
         return this.screenDetectionService.getScreen().pipe(
             pluck('screen'),
-            bufferCount(10),
+            bufferCount(7),
             map((lastScreens) => {
                 const lastStates = lastScreens
                     // filter scoreBoard as this can mean alive or dead (aka Schrödinger's Score Board)
@@ -29,17 +31,27 @@ export class DeathDetectionService {
                         }
                         return undefined;
                     });
-                // Count which state was most common
-                const countAlive = lastStates.filter((state) => state === 'alive').length;
-                const countDead = lastStates.filter((state) => state === 'dead').length;
-                const countUndefined = lastStates.filter((state) => state === undefined).length;
-                if (countDead > countAlive && countDead > countUndefined) {
-                    return 'dead';
+
+                // Add remembered value when all screens where score board
+                if (!lastStates.length) {
+                    lastStates.push(this.lastState);
                 }
-                if (countAlive >= countUndefined) {
-                    return 'alive';
+
+                let totalState: 'alive' | 'dead' | undefined;
+                if (!lastStates.some((state) => state !== 'dead')) {
+                    // When all where "dead", this is the state
+                    totalState = 'dead';
+
+                } else {
+                    const countAlive = lastStates.filter((state) => state === 'alive').length;
+                    const countUndefined = lastStates.filter((state) => state === undefined).length;
+                    if (countAlive >= countUndefined) {
+                        totalState = 'alive';
+                    }
                 }
-                return undefined;
+
+                this.lastState = totalState;
+                return totalState;
             })
         );
     }

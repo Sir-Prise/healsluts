@@ -47,10 +47,10 @@ const IN_GAME_ON_FIRE_MAX_MARKER = {r: 255, g: 255, b: 255, a: 0.79};
 
 // Common color positions
 const DARK_OVERLAY_TOP = [
-    {name: 'dark overlay top bg ul', x: 200, y: 115, color: DARK_OVERLAY_TOP_BG, contrast: {x: 200, y: 140}},
-    {name: 'dark overlay top border ul', x: 200, y: 126, color: DARK_OVERLAY_TOP_BORDER, contrast: {x: 200, y: 115}},
+    {name: 'dark overlay top bg ul', x: 200, y: 123, color: DARK_OVERLAY_TOP_BG, contrast: {x: 200, y: 130}},
+    {name: 'dark overlay top border ul', x: 200, y: 126, color: DARK_OVERLAY_TOP_BORDER, contrast: {x: 200, y: 123}},
     {name: 'dark overlay top bg ur', x: 1800, y: 25, color: DARK_OVERLAY_TOP_BG, contrast: {x: 1800, y: 127}},
-    {name: 'dark overlay top border ur', x: 1800, y: 127, color: DARK_OVERLAY_TOP_BORDER, contrast: {x: 1800, y: 140}},
+    {name: 'dark overlay top border ur', x: 1800, y: 127, color: DARK_OVERLAY_TOP_BORDER, contrast: {x: 1800, y: 130}},
 ];
 const IN_GAME_RETICLE = [
     // Currently, browsers always capture the cursor which overlays the reticle, so I picked a visible corner, not the center
@@ -151,8 +151,8 @@ export class ScreenDetectionService {
                 scoreBoard: .7,
                 interactionMenu: .5,
                 matchNoPrimary: .4,
-                alertPopup: .1,
-                undefined: .3,
+                alertPopup: .4,
+                undefined: .4,
             }
         },
         matchNoPrimary: {
@@ -161,11 +161,11 @@ export class ScreenDetectionService {
                 {name: 'health bar minimum filled', x: 261, y: 966, color: MATCH_HEALTH_BAR_FILLED}
             ],
             might: [
-                {name: 'on fire bar maximum empty', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
+                {name: 'on fire bar maximum not filled', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
                 ...IN_GAME_ON_FIRE_ICONS,
             ],
             nextScreens: {
-                matchAlive: 1,
+                matchAlive: 1.3,
                 matchDead: .9
             }
         },
@@ -176,8 +176,8 @@ export class ScreenDetectionService {
                 ...IN_GAME_ON_FIRE_ICONS,
             ],
             should: [
-                {name: 'blood ul', x: 10, y: 10, color: MATCH_DEAD_BLOOD_UL, contrast: {x: 130, y: 130}},
-                {name: 'blood lr', x: 1910, y: 1070, color: MATCH_DEAD_BLOOD_LR, contrast: {x: 1790, y: 950}},
+                {name: 'blood ul', x: 10, y: 10, color: MATCH_DEAD_BLOOD_UL, contrast: {x: 135, y: 100}},
+                {name: 'blood lr', x: 1910, y: 1070, color: MATCH_DEAD_BLOOD_LR, contrast: {x: 1790, y: 991}},
             ],
             might: [
                 {name: 'on fire bar maximum empty', x: 470, y: 980, color: MATCH_ON_FIRE_EMPTY},
@@ -283,7 +283,10 @@ export class ScreenDetectionService {
             // Default screen for not yet defined screens
             // might: [{x: 10, y: 10, color: {r: 0, g: 0, b: 0, a: 0}}],
             nextScreens: {
-                // All equal
+                menues: .6,
+                alertPopup: .6,
+                matchAlive: .6,
+                potgSpectating: .6,
             }
         }
     };
@@ -311,7 +314,7 @@ export class ScreenDetectionService {
     public analyzeScreen(frame: HTMLCanvasElement, expected?: ScreenName): {frame: HTMLCanvasElement, screen: ScreenName} {
         // Get all screens and their defined probability based on which was the last screen
         const screenBaseProbabilities = this.screenNames.reduce(
-            (prev, curr) => ({...prev, [curr]: 0}), {} as Record<ScreenName, number>);
+            (prev, curr) => ({...prev, [curr]: 0.3}), {} as Record<ScreenName, number>);
         if (this.lastScreenName) {
             const lastScreen = this.screens[this.lastScreenName];
             for (const nextScreen of Object.entries(lastScreen.nextScreens)) {
@@ -335,7 +338,7 @@ export class ScreenDetectionService {
                 // "undefined" screens always have the same probability
                 screenProbabilities.push({
                     name: 'undefined',
-                    probability: {probability: .7, confidence: .5, matchingPoints: []} as ScreenProbability
+                    probability: {probability: .6, confidence: .3, matchingPoints: []} as ScreenProbability
                 });
             } else {
                 screenProbabilities.push({
@@ -352,10 +355,11 @@ export class ScreenDetectionService {
             }
         }
 
-        // Get the screen with the highest probability (sort by pixel probability, previous screen probability, confidence)
+        // Get the screen with the highest probability
         const sortedScreens = screenProbabilities.sort((a, b) => {
-            return b.probability.probability - a.probability.probability ||
-                screenBaseProbabilities[b.name] * b.probability.confidence - screenBaseProbabilities[a.name] * a.probability.confidence;
+            const aProbability = screenBaseProbabilities[a.name] * .1 + a.probability.probability * .6 + a.probability.confidence * .3;
+            const bProbability = screenBaseProbabilities[b.name] * .1 + b.probability.probability * .6 + b.probability.confidence * .3;
+            return bProbability - aProbability;
         });
         const probableScreen = sortedScreens[0];
 
@@ -436,7 +440,7 @@ export class ScreenDetectionService {
     ): ScreenProbability {
         const points = [
             ...(screen.must || []).map((colorPosition) => ({factor: 1, maxForgivness: 0, colorPosition})),
-            ...(screen.should || []).map((colorPosition) => ({factor: 0.7, maxForgivness: 1, colorPosition})),
+            ...(screen.should || []).map((colorPosition) => ({factor: 0.8, maxForgivness: 1, colorPosition})),
             ...(screen.might || []).map((colorPosition) => ({factor: 0.3, maxForgivness: 2, colorPosition}))
         ];
 
@@ -469,36 +473,42 @@ export class ScreenDetectionService {
             }
 
             // Check for matching points if contrast to neighboring points is high enough
+            let factor = curr.factor;
             if (pixelIsColor && curr.colorPosition.contrast) {
                 if (this.colorUtilsService.getContrast(frame, curr.colorPosition, curr.colorPosition.contrast) < 0.15) {
                     matchingLowContrastCount++;
+                    factor *= .9;
                 }
 
             }
 
-            return prev + (pixelIsColor ? curr.factor : 0);
+            return prev + (pixelIsColor ? factor : 0);
         }, 0);
 
         const sumMax = points.reduce((prev, curr) => prev + curr.factor, 0);
         const probability = sum / sumMax;
 
         // Calculate confidence
+        // Decrease on unsure points
+        const averageFactorFactor = sumMax / points.length;
         // Decrease for forgiven values
         const forgivenValuesFactor = .7 ** (isCurrentScreen ? this.previousForgivenesses.length : 0);
         // Decrease for colors with high transparency
-        const transparencyFactor = .8 ** points.filter((point) => point.colorPosition.color.a < .5).length;
+        const transparencyFactor = .8 ** points.filter((point) => point.colorPosition.color.a <= .5).length;
         // Decrease for black + white
         const colorFactor = .95 ** points.map((point) => {
             const color = point.colorPosition.color;
             return color.r + color.g + color.b;
         }).filter((color) => color === 0 || color === 255 * 3).length;
         // Decrease for low number of checked points
-        const checksFactor = .95 ** (10 - points.length + matchingLowContrastCount);
+        const checksFactor = .9 ** (10 - points.length);
         // Extra decrease for low contrast
-        const lowContrastFactor = .9 ** matchingLowContrastCount;
-        const confidence = sumMax * forgivenValuesFactor * transparencyFactor * colorFactor * checksFactor * lowContrastFactor;
-        // console.log(`confidence for ${screen.name}:`, `confidence: ${confidence}`, `sumMax: ${sumMax}`, `forgivenValuesFactor: ${forgivenValuesFactor}`,
-        // `transparencyFactor: ${transparencyFactor}`, `colorFactor: ${colorFactor}`, `checksFactor: ${checksFactor}`, `matchingLowContrastCount: ${matchingLowContrastCount}`);
+        const lowContrastFactor = .8 ** matchingLowContrastCount;
+        const confidence = averageFactorFactor * forgivenValuesFactor * transparencyFactor * colorFactor * checksFactor * lowContrastFactor;
+        // console.log('confidence', {
+        //     screen: screen.name,
+        //     confidence, averageFactorFactor, forgivenValuesFactor, transparencyFactor, colorFactor, checksFactor, lowContrastFactor
+        // });
 
         return {probability, confidence, matchingPoints};
     }
