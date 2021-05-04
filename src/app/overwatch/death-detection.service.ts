@@ -17,7 +17,7 @@ export class DeathDetectionService {
     public getDeathState(): Observable<'alive' | 'dead' | undefined> {
         return this.screenDetectionService.getScreen().pipe(
             pluck('screen'),
-            bufferCount(7),
+            bufferCount(9),
             map((lastScreens) => {
                 const lastStates = lastScreens
                     // filter scoreBoard as this can mean alive or dead (aka Schrödinger's Score Board)
@@ -26,7 +26,7 @@ export class DeathDetectionService {
                         if (['matchAlive', 'matchNoPrimary', 'interactionMenu'].includes(screen)) {
                             return 'alive';
                         }
-                        if (['matchDead', 'killcam', 'deadSpectating'].includes(screen)) {
+                        if (['matchDead', 'killcam', 'deadSpectating', 'black'].includes(screen)) {
                             return 'dead';
                         }
                         return undefined;
@@ -38,16 +38,12 @@ export class DeathDetectionService {
                 }
 
                 let totalState: 'alive' | 'dead' | undefined;
-                if (!lastStates.some((state) => state !== 'dead')) {
-                    // When all where "dead", this is the state
+                const countAlive = lastStates.filter((state) => state === 'alive').length;
+                const countDead = lastStates.filter((state) => state === 'dead').length;
+                if (countDead >= 7) {
                     totalState = 'dead';
-
-                } else {
-                    const countAlive = lastStates.filter((state) => state === 'alive').length;
-                    const countUndefined = lastStates.filter((state) => state === undefined).length;
-                    if (countAlive >= countUndefined) {
-                        totalState = 'alive';
-                    }
+                } else if (countAlive >= 5) {
+                    totalState = 'alive';
                 }
 
                 this.lastState = totalState;

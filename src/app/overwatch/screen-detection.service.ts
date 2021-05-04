@@ -37,6 +37,7 @@ const SCORE_BOARD_LINES = {r: 255, g: 255, b: 255, a: 0.2};
 const SCORE_BOARD_MODE_LINES = {r: 255, g: 255, b: 255, a: 0.27};
 const INTERACTION_MENU_OUTER_CIRCLE = {r: 255, g: 255, b: 255, a: 1};
 const INTERACTION_MENU_OVERLAY = {r: 0, g: 0, b: 0, a: 0.73};
+const BLACK = {r: 0, g: 0, b: 0, a: 1};
 
 const DARK_OVERLAY_TOP_BORDER = {r: 255, g: 255, b: 255, a: 0.2};
 const DARK_OVERLAY_TOP_BG = {r: 0, g: 0, b: 0, a: 0.36};
@@ -63,7 +64,7 @@ const IN_GAME_ON_FIRE_ICONS = [
 ];
 
 type ScreenName = 'menues' | 'alertPopup' | 'loadingMap' | 'heroSelection' | 'matchAlive' | 'matchNoPrimary' | 'matchDead' | 'killcam' | 'deadSpectating' |
-    'potgSpectating' | 'scoreBoard' | 'interactionMenu' | 'undefined';
+    'potgSpectating' | 'scoreBoard' | 'interactionMenu' | 'black' | 'undefined';
 /* TODO Screens:
  * scoreScreen		(e.g. 1:0)
  * matchResult		("e.g. VICTORY")
@@ -184,6 +185,7 @@ export class ScreenDetectionService {
             ],
             nextScreens: {
                 killcam: 1,
+                black: 1,
                 scoreBoard: .7,
                 deadSpectating: .7,
             }
@@ -207,6 +209,7 @@ export class ScreenDetectionService {
             nextScreens: {
                 deadSpectating: .9,
                 matchAlive: .9,
+                black: .9,
                 scoreBoard: .7,
             }
         },
@@ -222,6 +225,7 @@ export class ScreenDetectionService {
             ],
             nextScreens: {
                 matchAlive: 1,
+                black: 1,
                 scoreBoard: .7,
             }
         },
@@ -259,6 +263,7 @@ export class ScreenDetectionService {
                 killcam: .7,
                 deadSpectating: .7,
                 potgSpectating: .5,
+                black: .5,
             }
         },
         interactionMenu: {
@@ -276,6 +281,22 @@ export class ScreenDetectionService {
             nextScreens: {
                 matchAlive: 1,
                 matchNoPrimary: .7
+            }
+        },
+        black: {
+            name: 'black',
+            must: [
+                {name: 'black center', x: 957, y: 539, color: BLACK},
+                {name: 'black ul', x: 120, y: 115, color: BLACK},
+                {name: 'black ll', x: 470, y: 980, color: BLACK},
+                {name: 'black lr', x: 1750, y: 740, color: BLACK},
+                {name: 'black ul', x: 1700, y: 25, color: BLACK},
+            ],
+            nextScreens: {
+                killcam: 1,
+                matchAlive: 1,
+                scoreBoard: .8,
+                deadSpectating: .8
             }
         },
         undefined: {
