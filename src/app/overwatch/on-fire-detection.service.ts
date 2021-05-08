@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 import { Position } from '../model/position.model';
 import { ColorUtilsService } from '../utils/color-utils.service';
-import { FrameService } from './frame.service';
 import { ScreenDetectionService } from './screen-detection.service';
 
 // Colors

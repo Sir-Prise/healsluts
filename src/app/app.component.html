@@ -5,8 +5,7 @@
 <input #expectedScreen type="text" placeholder="Expected screen" /><br>
 <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video><br>
 <div style="font-size:3em;">
-    <span>{{gameService.screen}}</span><br />
-    <span style="font-size:5em;color:blue">{{gameService.intensity}}</span>
+    <span>{{(gameServiceResponse | async) | json}}</span><br />
 </div>
 
 <h2>From video</h2>

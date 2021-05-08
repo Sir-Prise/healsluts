@@ -4,10 +4,9 @@ import { filter, map } from 'rxjs/operators';
 import { ColorUtilsService } from '../utils/color-utils.service';
 import { LoopService } from './loop.service';
 import { IFrameService } from '../model/frame-service.interface';
+import { AppModule } from '../app.module';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable()
 export class FrameService implements IFrameService {
     private videoElement: HTMLVideoElement;
     private frame: HTMLCanvasElement;

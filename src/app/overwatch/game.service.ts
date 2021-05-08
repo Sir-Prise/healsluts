@@ -20,17 +20,18 @@ export class GameService {
     ) {
     }
 
-    public start(): void {
-        combineLatest([
+    public start(): Observable<any> { // TODO: Better response type
+        return combineLatest([
             this.screenDetectionService.getScreen(),
             this.onFireDetectionService.getOnFireLevel().pipe(startWith(0)),
             this.deathDetectionService.getDeathState().pipe(startWith(undefined)),
         ]).pipe(
-            tap(([{screen}, onFireValue, deathState]) => {
+            map(([{screen}, onFireValue, deathState]) => {
                 this.screen = screen;
                 this.intensity = deathState;
                 // console.log('RESULT: ', screen, onFireValue);
+                return {screen, deathState, onFireValue};
             })
-        ).subscribe();
+        );
     }
 }

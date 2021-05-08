@@ -1,12 +1,12 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Injector, OnInit, ViewChild } from '@angular/core';
 import { ColorUtilsService } from './utils/color-utils.service';
 import { ScreenDetectionService } from './overwatch/screen-detection.service';
-import { OnFireDetectionService } from './overwatch/on-fire-detection.service';
 import { FrameService } from './overwatch/frame.service';
 import { GameService } from './overwatch/game.service';
-import { Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ImageDisplayService } from './tools/image-display.service';
+import { IFrameService } from './model/frame-service.interface';
+import { SetupService } from './overwatch/setup.service';
+import { Observable } from 'rxjs';
 
 const FRAME_RATE = 10;
 
@@ -26,13 +26,14 @@ export class AppComponent implements OnInit {
     @ViewChild('videoTest')
     public videoTestElement: ElementRef<HTMLVideoElement>;
 
+    public gameServiceResponse: Observable<any>;
+
+    private testVideoDescription?: string;
+
     public constructor(
         private readonly colorUtilsService: ColorUtilsService,
-        private readonly frameService: FrameService,
-        private readonly screenDetectionService: ScreenDetectionService,
-        private readonly onFireDetectionService: OnFireDetectionService,
-        public readonly gameService: GameService,
-        public readonly imageDisplayService: ImageDisplayService,
+        private readonly injector: Injector,
+        private readonly setupService: SetupService,
     ) {
     }
 
@@ -55,11 +56,13 @@ export class AppComponent implements OnInit {
             this.videoElement.nativeElement.onloadedmetadata = resolve;
         });
 
-        this.frameService.setup(this.videoElement.nativeElement);
+        const frameService = this.injector.get<IFrameService>(IFrameService) as FrameService;
+        frameService.setup(this.videoElement.nativeElement);
     }
 
     public onStartAnalyze(): void {
-        this.gameService.start();
+        const gameService = this.injector.get<GameService>(GameService) as GameService;
+        this.gameServiceResponse = gameService.start();
     }
 
     public onAnalyzeFrame(): void {
@@ -71,14 +74,28 @@ export class AppComponent implements OnInit {
         frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
 
         this.colorUtilsService.resetCache();
-        const result = this.screenDetectionService.analyzeScreen(frame, this.expectedScreenElement.nativeElement.value as any);
-        // console.log('analysis result', result);
+
+        const screenDetectionService = this.injector.get<ScreenDetectionService>(ScreenDetectionService) as ScreenDetectionService;
+        const result = screenDetectionService.analyzeScreen(frame, this.expectedScreenElement.nativeElement.value as any);
+    }
+
+    public onChangeTestVideoDescription(files: FileList): void {
+        const reader = new FileReader();
+        reader.onload = () => {
+            this.testVideoDescription = reader.result.toString();
+        };
+        reader.readAsText(files[0]);
     }
 
     public onChangeTestVideo(files: FileList): void {
-        this.imageDisplayService.onChangeTestVideo(this.videoTestElement.nativeElement, files);
-        const reliablilty = this.screenDetectionService.reliability;
-        this.screenDetectionService.getScreen().subscribe({
+        this.setupService.useImageDisplayService = true;
+        const imageDisplayService = this.injector.get<IFrameService>(IFrameService) as ImageDisplayService;
+        imageDisplayService.setDescription(this.testVideoDescription);
+        imageDisplayService.onChangeTestVideo(this.videoTestElement.nativeElement, files);
+        this.setupService.useImageDisplayService = true;
+        const screenDetectionService = this.injector.get<ScreenDetectionService>(ScreenDetectionService) as ScreenDetectionService;
+        const reliablilty = screenDetectionService.reliability;
+        screenDetectionService.getScreen().subscribe({
             complete(): void {
                 console.log('FINISHED ANALYZING', reliablilty);
                 reliablilty.forEach((results, screen) => {
@@ -87,13 +104,5 @@ export class AppComponent implements OnInit {
                 });
             }
         });
-    }
-
-    public onChangeTestVideoDescription(files: FileList): void {
-        const reader = new FileReader();
-        reader.onload = () => {
-            this.imageDisplayService.setDescription(reader.result.toString());
-        };
-        reader.readAsText(files[0]);
     }
 }

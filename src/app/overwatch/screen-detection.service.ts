@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ColorRGBAPosition } from '../model/color-rgba-position.model';
+import { IFrameService } from '../model/frame-service.interface';
 import { Position } from '../model/position.model';
 import { ColorDifferenceService } from '../tools/color-difference.service';
 import { ImageDisplayService } from '../tools/image-display.service';
 import { ColorUtilsService } from '../utils/color-utils.service';
-import { FrameService } from './frame.service';
 
 // Colors
 const MENUES_ADD_FRIEND_BTN_BG = {r: 50, g: 159, b: 231, a: 0.92};
@@ -318,7 +318,8 @@ export class ScreenDetectionService {
     public reliability = new Map<ScreenName, {correct: number, incorrect: number}>();
 
     public constructor(
-        private readonly frameService: FrameService,
+        private readonly frameService: IFrameService,
+        // private readonly frameService: FrameService,
         // private readonly frameService: ImageDisplayService,
         private readonly colorUtilsService: ColorUtilsService,
         private readonly colorDifferenceService: ColorDifferenceService,
