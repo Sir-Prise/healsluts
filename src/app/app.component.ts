@@ -94,14 +94,9 @@ export class AppComponent implements OnInit {
         imageDisplayService.onChangeTestVideo(this.videoTestElement.nativeElement, files);
         this.setupService.useImageDisplayService = true;
         const screenDetectionService = this.injector.get<ScreenDetectionService>(ScreenDetectionService) as ScreenDetectionService;
-        const reliablilty = screenDetectionService.reliability;
         screenDetectionService.getScreen().subscribe({
             complete(): void {
-                console.log('FINISHED ANALYZING', reliablilty);
-                reliablilty.forEach((results, screen) => {
-                    const count = results.correct + results.incorrect;
-                    console.log(screen, `${Math.round(100 * results.correct / count)}% correct`, `${count} expected times`);
-                });
+                screenDetectionService.log();
             }
         });
     }
