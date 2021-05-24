@@ -59,6 +59,9 @@ const IN_GAME_ON_FIRE_ICONS = [
     {name: 'on fire max marker', x: 432, y: 996, color: IN_GAME_ON_FIRE_MAX_MARKER},
 ];
 
+// Default "max duration" for all screens which usually aren't visible for very long but are theoretically it's possible to see them longer
+const MAX_DURATION_SANE = 10_000;
+
 // Types
 type ScreensModel<T extends string> = Record<T, Screen<T>>;
 
@@ -92,7 +95,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
         ],
         nextScreens: {
             // All equal
-        }
+        },
+        maxDuration: MAX_DURATION_SANE
     },
     loadingMap: {
         name: 'loadingMap',
@@ -104,7 +108,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
         ],
         nextScreens: {
             heroSelection: 1
-        }
+        },
+        maxDuration: 8_000
     },
     heroSelection: {
         name: 'heroSelection',
@@ -118,7 +123,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
         ],
         nextScreens: {
             matchAlive: 1
-        }
+        },
+        maxDuration: 30_000
     },
     matchAlive: {
         name: 'matchAlive',
@@ -151,7 +157,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
         nextScreens: {
             matchAlive: 1.3,
             matchDead: .9
-        }
+        },
+        maxDuration: 20_000 // Theoretically longer by staying in emote
     },
     matchDead: {
         name: 'matchDead',
@@ -171,7 +178,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
             black: 1,
             scoreBoard: .7,
             deadSpectating: .7,
-        }
+        },
+        maxDuration: 4_000
     },
     killcam: {
         name: 'killcam',
@@ -194,7 +202,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
             matchAlive: .9,
             black: .9,
             scoreBoard: .7,
-        }
+        },
+        maxDuration: 6_000
     },
     deadSpectating: {
         name: 'deadSpectating',
@@ -210,7 +219,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
             matchAlive: 1,
             black: 1,
             scoreBoard: .7,
-        }
+        },
+        maxDuration: 7_000
     },
     potgSpectating: {
         name: 'potgSpectating',
@@ -225,7 +235,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
         ],
         nextScreens: {
             undefined: 1,
-        }
+        },
+        maxDuration: 11_000
     },
     scoreBoard: {
         name: 'scoreBoard',
@@ -247,7 +258,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
             deadSpectating: .7,
             potgSpectating: .5,
             black: .5,
-        }
+        },
+        maxDuration: MAX_DURATION_SANE
     },
     interactionMenu: {
         name: 'interactionMenu',
@@ -264,7 +276,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
         nextScreens: {
             matchAlive: 1,
             matchNoPrimary: .7
-        }
+        },
+        maxDuration: MAX_DURATION_SANE
     },
     black: {
         name: 'black',
@@ -280,7 +293,8 @@ const screens: ScreensModel<OverwatchScreenName> = {
             matchAlive: 1,
             scoreBoard: .8,
             deadSpectating: .8
-        }
+        },
+        maxDuration: 2_000
     },
     undefined: {
         name: 'undefined',

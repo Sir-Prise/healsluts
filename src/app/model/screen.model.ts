@@ -7,4 +7,5 @@ export interface Screen<T extends string> {
     should?: ScreenPoint[];
     might?: ScreenPoint[];
     nextScreens: Partial<Record<T, number>>;
+    maxDuration?: number;
 }

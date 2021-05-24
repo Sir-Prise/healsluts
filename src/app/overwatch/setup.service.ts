@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 export class SetupService {
 
     public useImageDisplayService = false;
+    public loopInterval = 200;
 
     constructor() { }
 
