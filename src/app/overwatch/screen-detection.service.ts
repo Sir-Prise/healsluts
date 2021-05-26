@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ScreenByPixelService } from './screen-by-pixel.service';
 import { OverwatchScreenName } from './screen-names';
 import { ScreenPlausibilityService } from './screen-plausibility.service';
@@ -22,10 +23,13 @@ export class ScreenDetectionService<TScreenName extends OverwatchScreenName = Ov
      */
     public getScreen(): Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined'}> {
         return this.screenByPixelService.getScreen().pipe(
-            this.screenPlausibilityService.clean()
+            this.screenPlausibilityService.clean(),
+            tap((detection) => {
+                if (detection.screen === 'undefined') {
+                    this.screenByPixelService.setLastScreenName('undefined');
+                }
+            })
         );
-
-        // TODO: Set byPixel.lastScreen to "undefined" when result of plausibility check
     }
 
     /**

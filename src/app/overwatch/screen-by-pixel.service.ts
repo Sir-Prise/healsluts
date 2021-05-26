@@ -101,6 +101,10 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
         return {frame, screen: this.lastScreenName};
     }
 
+    public setLastScreenName(screenName: 'undefined' | TScreenName): void {
+        this.lastScreenName = screenName;
+    }
+
     private log(
         frame: HTMLCanvasElement,
         actual: AnalyzedScreen<TScreenName | 'undefined'>,
