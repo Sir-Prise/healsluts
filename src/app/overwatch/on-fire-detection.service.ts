@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators';
+import { Observable, OperatorFunction } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Position } from '../model/position.model';
 import { ColorUtilsService } from '../utils/color-utils.service';
-import { ScreenDetectionService } from './screen-detection.service';
+import { OverwatchScreenName } from './screen-names';
 
 // Colors
 const ON_FIRE_BAR_BLUE = {r: 135, g: 249, b: 249, a: 0.71};
@@ -18,22 +18,26 @@ export class OnFireDetectionService {
     private previousValues: Array<Value> = [{value: 0, confidence: .5}];
 
     public constructor(
-        private readonly screenDetectionService: ScreenDetectionService,
         private readonly colorUtilsService: ColorUtilsService,
     ) {
     }
 
-    public getOnFireLevel(): Observable<number> {
-        return this.screenDetectionService.getScreen().pipe(
-            filter(({screen}) => screen === 'matchAlive'),
-            map(({frame}) => {
-                const newLevel = this.getCurrentLevel(frame);
+    public addOnFireLevel
+        <T extends {frame: HTMLCanvasElement, screen: OverwatchScreenName}>(
+    ): OperatorFunction<T, T & {onFireValue: number}> {
+        return (source: Observable<T>) => source.pipe(
+            map((input) => {
+                const frame = input.frame;
+                const screen = input.screen;
+                if (screen === 'matchAlive') {
+                    const newLevel = this.getCurrentLevel(frame);
 
-                if (newLevel) {
-                    this.pushValue(newLevel);
+                    if (newLevel) {
+                        this.pushValue(newLevel);
+                    }
                 }
 
-                return this.getAverageValue();
+                return {...input, onFireValue: this.getAverageValue()};
             })
         );
     }

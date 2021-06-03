@@ -65,6 +65,7 @@ const MAX_DURATION_SANE = 10_000;
 // Types
 type ScreensModel<T extends string> = Record<T, Screen<T>>;
 
+// TODO: Don't use upper 20px because FPS overlay
 const screens: ScreensModel<OverwatchScreenName> = {
     menues: {
         name: 'menues',

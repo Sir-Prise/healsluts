@@ -6,9 +6,7 @@ import { SetupService } from './setup.service';
 /**
  * Service which returns an observable which ticks every X milliseconds.
  */
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable()
 export class LoopService {
 
     public isPaused = false;

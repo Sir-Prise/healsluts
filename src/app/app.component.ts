@@ -7,6 +7,8 @@ import { ImageDisplayService } from './tools/image-display.service';
 import { IFrameService } from './model/frame-service.interface';
 import { SetupService } from './overwatch/setup.service';
 import { Observable } from 'rxjs';
+import { LoopService } from './overwatch/loop.service';
+import { LoopManualService } from './overwatch/loop-manual.service';
 
 const FRAME_RATE = 10;
 
@@ -31,7 +33,6 @@ export class AppComponent implements OnInit {
     private testVideoDescription?: string;
 
     public constructor(
-        private readonly colorUtilsService: ColorUtilsService,
         private readonly injector: Injector,
         private readonly setupService: SetupService,
     ) {
@@ -60,23 +61,23 @@ export class AppComponent implements OnInit {
         frameService.setup(this.videoElement.nativeElement);
     }
 
+    public async onStartManualMode(): Promise<void> {
+        this.setupService.useManualLoop = true;
+
+        await this.onStartVideo();
+
+        const gameService = this.injector.get<GameService>(GameService) as GameService;
+        this.gameServiceResponse = gameService.start();
+    }
+
     public onStartAnalyze(): void {
         const gameService = this.injector.get<GameService>(GameService) as GameService;
         this.gameServiceResponse = gameService.start();
     }
 
     public onAnalyzeFrame(): void {
-        const frame = document.createElement('canvas');
-        frame.width = this.videoElement.nativeElement.videoWidth;
-        frame.height = this.videoElement.nativeElement.videoHeight;
-        const frameContext = frame.getContext('2d');
-
-        frameContext.drawImage(this.videoElement.nativeElement, 0, 0);
-
-        this.colorUtilsService.resetCache();
-
-        const screenDetectionService = this.injector.get<ScreenDetectionService>(ScreenDetectionService) as ScreenDetectionService;
-        const result = screenDetectionService.analyzeScreen(frame, this.expectedScreenElement.nativeElement.value as any);
+        const loopManualService = this.injector.get<LoopService>(LoopService) as unknown as LoopManualService;
+        loopManualService.tick();
     }
 
     public onChangeTestVideoDescription(files: FileList): void {

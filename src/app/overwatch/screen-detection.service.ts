@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { IFrameService } from '../model/frame-service.interface';
 import { ScreenByPixelService } from './screen-by-pixel.service';
 import { OverwatchScreenName } from './screen-names';
 import { ScreenPlausibilityService } from './screen-plausibility.service';
@@ -13,6 +14,7 @@ import { ScreenPlausibilityService } from './screen-plausibility.service';
 })
 export class ScreenDetectionService<TScreenName extends OverwatchScreenName = OverwatchScreenName> {
     public constructor(
+        private readonly frameService: IFrameService,
         private readonly screenByPixelService: ScreenByPixelService<TScreenName>,
         private readonly screenPlausibilityService: ScreenPlausibilityService,
     ) {
@@ -22,21 +24,23 @@ export class ScreenDetectionService<TScreenName extends OverwatchScreenName = Ov
      * Returns an observable emiting the detected screen every tick.
      */
     public getScreen(): Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined'}> {
-        return this.screenByPixelService.getScreen().pipe(
+        return this.frameService.getFrame().pipe(
+            this.screenByPixelService.getScreen(),
             this.screenPlausibilityService.clean(),
             tap((detection) => {
                 if (detection.screen === 'undefined') {
                     this.screenByPixelService.setLastScreenName('undefined');
                 }
-            })
+            }),
         );
-    }
-
-    /**
-     * Analyzes a single frame.
-     */
-    public analyzeScreen(frame: HTMLCanvasElement, expected?: TScreenName | 'undefined'): {frame: HTMLCanvasElement, screen: TScreenName | 'undefined'} {
-        return this.screenByPixelService.analyzeScreen(frame, expected);
+        // return this.screenByPixelService.getScreen().pipe(
+        //     this.screenPlausibilityService.clean(),
+        //     tap((detection) => {
+        //         if (detection.screen === 'undefined') {
+        //             this.screenByPixelService.setLastScreenName('undefined');
+        //         }
+        //     })
+        // );
     }
 
     /**

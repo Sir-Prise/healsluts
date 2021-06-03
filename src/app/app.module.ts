@@ -12,6 +12,7 @@ import { LoopService } from './overwatch/loop.service';
 import { ColorUtilsService } from './utils/color-utils.service';
 import { ImageDisplayService } from './tools/image-display.service';
 import { FrameService } from './overwatch/frame.service';
+import { LoopManualService } from './overwatch/loop-manual.service';
 
 @NgModule({
     declarations: [
@@ -28,12 +29,18 @@ import { FrameService } from './overwatch/frame.service';
     providers: [
         {provide: IFrameService, useFactory:
             (setupService: SetupService, loopService: LoopService, colorUtilsService: ColorUtilsService) => {
-                console.log('frame service factory');
                 if (setupService.useImageDisplayService) {
                     return new ImageDisplayService(colorUtilsService);
                 }
                 return new FrameService(loopService, colorUtilsService);
         }, deps: [SetupService, LoopService, ColorUtilsService]},
+        {provide: LoopService, useFactory:
+            (setupService: SetupService) => {
+                if (setupService.useManualLoop) {
+                    return new LoopManualService();
+                }
+                return new LoopService(setupService);
+        }, deps: [SetupService]},
     ],
     bootstrap: [AppComponent]
 })

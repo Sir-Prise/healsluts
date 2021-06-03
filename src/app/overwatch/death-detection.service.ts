@@ -1,54 +1,50 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { bufferCount, map, pluck } from 'rxjs/operators';
-import { ScreenDetectionService } from './screen-detection.service';
+import { Observable, OperatorFunction } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { FixedLengthArray } from '../utils/fixed-length-array';
+import { OverwatchScreenName } from './screen-names';
 
 @Injectable({
     providedIn: 'root'
 })
 export class DeathDetectionService {
 
-    private lastState: 'alive' | 'dead' | undefined;
+    private previousStates = new FixedLengthArray<DeathState>(9, undefined);
 
     constructor(
-        private readonly screenDetectionService: ScreenDetectionService
     ) { }
 
-    public getDeathState(): Observable<'alive' | 'dead' | undefined> {
-        return this.screenDetectionService.getScreen().pipe(
-            pluck('screen'),
-            bufferCount(9),
-            map((lastScreens) => {
-                const lastStates = lastScreens
-                    // filter scoreBoard as this can mean alive or dead (aka Schrödinger's Score Board)
-                    .filter((screen) => screen !== 'scoreBoard')
-                    .map((screen) => {
-                        if (['matchAlive', 'matchNoPrimary', 'interactionMenu'].includes(screen)) {
-                            return 'alive';
-                        }
-                        if (['matchDead', 'killcam', 'deadSpectating', 'black'].includes(screen)) {
-                            return 'dead';
-                        }
-                        return undefined;
-                    });
-
-                // Add remembered value when all screens where score board
-                if (!lastStates.length) {
-                    lastStates.push(this.lastState);
+    public addDeathState<T extends {screen: OverwatchScreenName}>(
+    ): OperatorFunction<T, T & {deathState: DeathState}> {
+        return (source: Observable<T>) => source.pipe(
+            map((input) => {
+                if (input.screen !== 'scoreBoard') {
+                    this.previousStates.push(this.screenToDeathState(input.screen));
                 }
 
-                let totalState: 'alive' | 'dead' | undefined;
-                const countAlive = lastStates.filter((state) => state === 'alive').length;
-                const countDead = lastStates.filter((state) => state === 'dead').length;
+                let deathState: DeathState;
+                const countAlive = this.previousStates.getValues().filter((state) => state === 'alive').length;
+                const countDead = this.previousStates.getValues().filter((state) => state === 'dead').length;
                 if (countDead >= 7) {
-                    totalState = 'dead';
+                    deathState = 'dead';
                 } else if (countAlive >= 5) {
-                    totalState = 'alive';
+                    deathState = 'alive';
                 }
 
-                this.lastState = totalState;
-                return totalState;
+                return {...input, deathState};
             })
         );
     }
+
+    private screenToDeathState(screen: OverwatchScreenName): DeathState {
+        if (['matchAlive', 'matchNoPrimary', 'interactionMenu'].includes(screen)) {
+            return 'alive';
+        }
+        if (['matchDead', 'killcam', 'deadSpectating', 'black'].includes(screen)) {
+            return 'dead';
+        }
+        return undefined;
+    }
 }
+
+type DeathState = 'alive' | 'dead' | undefined;

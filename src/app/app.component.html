@@ -1,6 +1,8 @@
-<h2>From screen</h2>
 <button (click)="onStartVideo()">Start video</button><br>
-<button (click)="onStartAnalyze()">Start analyze</button><br>
+<button (click)="onStartAnalyze()">Start analyze</button>
+
+<h2>Debugging</h2>
+<button (click)="onStartManualMode()">Start in manual mode</button><br>
 <button (click)="onAnalyzeFrame()">Analyze frame</button>
 <input #expectedScreen type="text" placeholder="Expected screen" /><br>
 <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video><br>

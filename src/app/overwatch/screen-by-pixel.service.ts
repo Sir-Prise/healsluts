@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IFrameService } from '../model/frame-service.interface';
 import { ScreenPoint } from '../model/screen-point.model';
@@ -16,6 +16,7 @@ import { ScreenSettingsService } from './screen-settings.service';
     providedIn: 'root'
 })
 export class ScreenByPixelService<TScreenName extends OverwatchScreenName = OverwatchScreenName> {
+    private screens: Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined'}>;
     private readonly screenNames: Array<TScreenName | 'undefined'>;
     private lastScreenName: TScreenName | 'undefined';
 
@@ -28,15 +29,22 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
         private readonly colorDifferenceService: ColorDifferenceService,
     ) {
         this.screenNames = Object.keys(this.screenSettingsService.getScreens()) as TScreenName[];
-    }
 
-    public getScreen(): Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined'}> {
-        return this.frameService.getFrame().pipe(
+        this.screens = this.frameService.getFrame().pipe(
             map(({frame, expected}) => this.analyzeScreen(frame, expected as TScreenName | 'undefined'))
         );
     }
 
-    public analyzeScreen(frame: HTMLCanvasElement, expected?: TScreenName | 'undefined'): {frame: HTMLCanvasElement, screen: TScreenName | 'undefined'} {
+    public getScreen<
+        T extends {frame: HTMLCanvasElement, expected?: TScreenName | 'undefined'}
+    >(
+    ): OperatorFunction<T, T & {screen: TScreenName | 'undefined'}> {
+        return (source: Observable<T>) => source.pipe(
+            map(({frame, expected}) => ({screen: this.analyzeScreen(frame, expected).screen, expected, frame} as T & {screen: TScreenName | 'undefined'}))
+        );
+    }
+
+    private analyzeScreen(frame: HTMLCanvasElement, expected?: TScreenName | 'undefined'): {frame: HTMLCanvasElement, screen: TScreenName | 'undefined'} {
         // Get all screens and their defined probability based on which was the last screen
         const screenBaseProbabilities = this.screenNames.reduce(
             (prev, curr) => ({...prev, [curr]: 0.3}), {} as Record<TScreenName | 'undefined', number>);

@@ -20,13 +20,11 @@ export class GameService {
     ) {
     }
 
-    public start(): Observable<any> { // TODO: Better response type
-        return combineLatest([
-            this.screenDetectionService.getScreen(),
-            this.onFireDetectionService.getOnFireLevel().pipe(startWith(0)),
-            this.deathDetectionService.getDeathState().pipe(startWith(undefined)),
-        ]).pipe(
-            map(([{screen}, onFireValue, deathState]) => {
+    public start(): Observable<unknown> {
+        return this.screenDetectionService.getScreen().pipe(
+            this.onFireDetectionService.addOnFireLevel(),
+            this.deathDetectionService.addDeathState(),
+            map(({screen, onFireValue, deathState}) => {
                 this.screen = screen;
                 this.intensity = deathState;
                 // console.log('RESULT: ', screen, onFireValue);
