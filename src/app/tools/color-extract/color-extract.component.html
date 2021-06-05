@@ -1,0 +1,9 @@
+<form [formGroup]="form" (submit)="onSubmit()">
+    <p>
+        Enter the position (or positions; comma separated) you want the get the colors from.<br />
+        <input formControlName="positions" placeholder="e.g.: 100 100, 1920 1080" />
+    </p>
+    <button>Get colors</button>
+</form>
+
+<textarea #colorsOutput style="width: 300px; height: 200px;"></textarea>

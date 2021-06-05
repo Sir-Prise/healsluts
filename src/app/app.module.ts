@@ -13,13 +13,15 @@ import { ColorUtilsService } from './utils/color-utils.service';
 import { ImageDisplayService } from './tools/image-display.service';
 import { FrameService } from './overwatch/frame.service';
 import { LoopManualService } from './overwatch/loop-manual.service';
+import { ColorExtractComponent } from './tools/color-extract/color-extract.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         AlphaCalculatorComponent,
         IsColorCalculatorComponent,
-        VideoAnnotatorComponent
+        VideoAnnotatorComponent,
+        ColorExtractComponent
     ],
     imports: [
         BrowserModule,

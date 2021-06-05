@@ -6,8 +6,7 @@ import { ColorUtilsService } from '../utils/color-utils.service';
 import { OverwatchScreenName } from './screen-names';
 
 // Colors
-const ON_FIRE_BAR_BLUE = {r: 135, g: 249, b: 249, a: 0.71};
-// const ON_FIRE_BAR_BLUE = {r: 117, g: 249, b: 289, a: 0.8}; // More restrictive, not working on glowing
+const ON_FIRE_BAR_BLUE = {r: 120, g: 470, b: 470, a: 0.6}; // G and B actually out of range, but high alpha
 const ON_FIRE_BAR_WHITE = {r: 255, g: 255, b: 255, a: 0.99};
 const ON_FIRE_BAR_GLOW = {r: 30, g: 59, b: 255, a: 0.3}; // color 6px below end of bar
 
@@ -178,7 +177,7 @@ export class OnFireDetectionService {
 
     private pushValue(value: Value): void {
         this.previousValues.push(value);
-        while (this.previousValues.length > 5) {
+        while (this.previousValues.length > 7) {
             this.previousValues.shift();
         }
     }

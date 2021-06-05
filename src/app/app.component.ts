@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
     private expectedScreenElement: ElementRef<HTMLInputElement>;
 
     @ViewChild('video')
-    private videoElement: ElementRef<HTMLVideoElement>;
+    public videoElement: ElementRef<HTMLVideoElement>;
 
     @ViewChild('videoTest')
     public videoTestElement: ElementRef<HTMLVideoElement>;
