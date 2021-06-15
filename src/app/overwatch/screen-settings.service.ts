@@ -168,7 +168,7 @@ const screens: ScreensModel<OverwatchScreenName> = {
             ...IN_GAME_ON_FIRE_ICONS,
         ],
         should: [
-            {name: 'blood ul', x: 10, y: 10, color: MATCH_DEAD_BLOOD_UL, contrast: {x: 135, y: 100}},
+            {name: 'blood ul', x: 10, y: 25, color: MATCH_DEAD_BLOOD_UL, contrast: {x: 135, y: 100}},
             {name: 'blood lr', x: 1910, y: 1070, color: MATCH_DEAD_BLOOD_LR, contrast: {x: 1790, y: 991}},
         ],
         might: [
@@ -242,7 +242,7 @@ const screens: ScreensModel<OverwatchScreenName> = {
     scoreBoard: {
         name: 'scoreBoard',
         must: [
-            {name: 'top bg ul', x: 160, y: 15, color: SCORE_BOARD_TOP_BOTTOM_BG},
+            {name: 'top bg ul', x: 160, y: 25, color: SCORE_BOARD_TOP_BOTTOM_BG},
             {name: 'top bg lr', x: 1500, y: 70, color: SCORE_BOARD_TOP_BOTTOM_BG},
             {name: 'bottom bg', x: 960, y: 1050, color: SCORE_BOARD_TOP_BOTTOM_BG},
             {name: 'global overlay ul', x: 300, y: 300, color: SCORE_BOARD_GLOBAL_OVERLAY},
@@ -269,7 +269,7 @@ const screens: ScreensModel<OverwatchScreenName> = {
             {name: 'outer circle lr', x: 1030, y: 600, color: INTERACTION_MENU_OUTER_CIRCLE},
         ],
         should: [
-            {name: 'overlay ul', x: 10, y: 10, color: INTERACTION_MENU_OVERLAY},
+            {name: 'overlay ul', x: 10, y: 25, color: INTERACTION_MENU_OVERLAY},
             {name: 'overlay lr', x: 1910, y: 1070, color: INTERACTION_MENU_OVERLAY},
             {name: 'overlay ur', x: 1500, y: 70, color: INTERACTION_MENU_OVERLAY},
             {name: 'overlay ll', x: 261, y: 966, color: INTERACTION_MENU_OVERLAY},
