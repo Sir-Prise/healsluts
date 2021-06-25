@@ -9,6 +9,7 @@ import { SetupService } from './overwatch/setup.service';
 import { Observable } from 'rxjs';
 import { LoopService } from './overwatch/loop.service';
 import { LoopManualService } from './overwatch/loop-manual.service';
+import { share } from 'rxjs/operators';
 
 const FRAME_RATE = 10;
 
@@ -67,12 +68,12 @@ export class AppComponent implements OnInit {
         await this.onStartVideo();
 
         const gameService = this.injector.get<GameService>(GameService) as GameService;
-        this.gameServiceResponse = gameService.start();
+        this.gameServiceResponse = gameService.start().pipe(share());
     }
 
     public onStartAnalyze(): void {
         const gameService = this.injector.get<GameService>(GameService) as GameService;
-        this.gameServiceResponse = gameService.start();
+        this.gameServiceResponse = gameService.start().pipe(share());
     }
 
     public onAnalyzeFrame(): void {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { combineLatest, Observable } from 'rxjs';
-import { map, startWith, tap, withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { DeathDetectionService } from './death-detection.service';
 import { OnFireDetectionService } from './on-fire-detection.service';
 import { ScreenDetectionService } from './screen-detection.service';
@@ -10,8 +10,9 @@ import { ScreenDetectionService } from './screen-detection.service';
 })
 export class GameService {
 
-    public screen: string;
-    public intensity: any;
+    public intensity = new BehaviorSubject(0);
+
+    private previousIntensity = 0;
 
     constructor(
         private readonly screenDetectionService: ScreenDetectionService,
@@ -25,11 +26,21 @@ export class GameService {
             this.onFireDetectionService.addOnFireLevel(),
             this.deathDetectionService.addDeathState(),
             map(({screen, onFireValue, deathState}) => {
-                this.screen = screen;
-                this.intensity = deathState;
-                // console.log('RESULT: ', screen, onFireValue);
+                let newIntensity: number | undefined;
+                if (deathState === 'alive') {
+                    newIntensity = onFireValue;
+                } else if (deathState === 'dead') {
+                    newIntensity = 0;
+                } else {
+                    newIntensity = Math.max(this.previousIntensity - .02, 0);
+                }
+
+                this.previousIntensity = newIntensity;
+                this.intensity.next(newIntensity);
+                // console.log('gameService', {screen, deathState, onFireValue, newIntensity});
                 return {screen, deathState, onFireValue};
-            })
+            }),
+            switchMap(() => this.intensity)
         );
     }
 }
