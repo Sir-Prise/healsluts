@@ -1,6 +1,7 @@
 <div [style]="'background: rgba(0, 0, 255, ' + (gameServiceResponse | async) + ')'">
     <button (click)="onStartVideo()">Start video</button><br>
-    <button (click)="onStartAnalyze()">Start analyze</button>
+    <button (click)="onStartAnalyze()">Start analyze</button><br />
+    <button (click)="onConnectDevice()">Connect vibe</button>
 
     <h2>Debugging</h2>
     <button (click)="onStartManualMode()">Start in manual mode</button><br>
