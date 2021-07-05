@@ -14,6 +14,9 @@ import { ImageDisplayService } from './tools/image-display.service';
 import { FrameService } from './overwatch/frame.service';
 import { LoopManualService } from './overwatch/loop-manual.service';
 import { ColorExtractComponent } from './tools/color-extract/color-extract.component';
+import { DevicesComponent } from './device/device-connector/device-connector.component';
+import { TypiconComponent } from './components/typicon/typicon.component';
+import { AlertComponent } from './components/alert/alert.component';
 
 @NgModule({
     declarations: [
@@ -21,7 +24,10 @@ import { ColorExtractComponent } from './tools/color-extract/color-extract.compo
         AlphaCalculatorComponent,
         IsColorCalculatorComponent,
         VideoAnnotatorComponent,
-        ColorExtractComponent
+        ColorExtractComponent,
+        DevicesComponent,
+        TypiconComponent,
+        AlertComponent,
     ],
     imports: [
         BrowserModule,

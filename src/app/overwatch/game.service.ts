@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { DeviceService } from '../device/device.service';
 import { DeathDetectionService } from './death-detection.service';
 import { OnFireDetectionService } from './on-fire-detection.service';
 import { ScreenDetectionService } from './screen-detection.service';
@@ -10,14 +11,13 @@ import { ScreenDetectionService } from './screen-detection.service';
 })
 export class GameService {
 
-    public intensity = new BehaviorSubject(0);
-
     private previousIntensity = 0;
 
     constructor(
         private readonly screenDetectionService: ScreenDetectionService,
         private readonly onFireDetectionService: OnFireDetectionService,
         private readonly deathDetectionService: DeathDetectionService,
+        private readonly deviceService: DeviceService,
     ) {
     }
 
@@ -31,16 +31,16 @@ export class GameService {
                     newIntensity = onFireValue;
                 } else if (deathState === 'dead') {
                     newIntensity = 0;
+                    // Set push-intensity to -1 to counter all positive pushs
+                    this.deviceService.setPushIntensity(-1, 500);
                 } else {
                     newIntensity = Math.max(this.previousIntensity - .02, 0);
                 }
 
                 this.previousIntensity = newIntensity;
-                this.intensity.next(newIntensity);
-                // console.log('gameService', {screen, deathState, onFireValue, newIntensity});
-                return {screen, deathState, onFireValue};
+                this.deviceService.setBaseIntensity(newIntensity);
+                return {intensity: newIntensity, screen, deathState, onFireValue};
             }),
-            switchMap(() => this.intensity)
         );
     }
 }

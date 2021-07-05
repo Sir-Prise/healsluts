@@ -1,7 +1,7 @@
 <div [style]="'background: rgba(0, 0, 255, ' + (gameServiceResponse | async) + ')'">
     <button (click)="onStartVideo()">Start video</button><br>
     <button (click)="onStartAnalyze()">Start analyze</button><br />
-    <button (click)="onConnectDevice()">Connect vibe</button>
+    <app-devices></app-devices>
 
     <h2>Debugging</h2>
     <button (click)="onStartManualMode()">Start in manual mode</button><br>
@@ -9,7 +9,7 @@
     <input #expectedScreen type="text" placeholder="Expected screen" /><br>
     <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video><br>
     <div style="font-size:3em;">
-        <span>{{(gameServiceResponse | async) | number:'1.2-2'}}</span><br />
+        <span>{{gameServiceResponse | async}}</span><br />
     </div>
 
     <h2>From video</h2>

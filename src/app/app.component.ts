@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 import { LoopService } from './overwatch/loop.service';
 import { LoopManualService } from './overwatch/loop-manual.service';
 import { share } from 'rxjs/operators';
-import { ButtplugClient, ButtplugClientDevice, ButtplugEmbeddedConnectorOptions, buttplugInit } from 'buttplug';
+import { DeviceService } from './device/device.service';
 
 const FRAME_RATE = 10;
 
@@ -101,21 +101,5 @@ export class AppComponent implements OnInit {
                 screenDetectionService.log();
             }
         });
-    }
-
-    public async onConnectDevice(): Promise<void> {
-        await buttplugInit();
-        const connector = new ButtplugEmbeddedConnectorOptions();
-        const client = new ButtplugClient('Developer Guide Example');
-
-        client.addListener('deviceadded', async (device: ButtplugClientDevice) => {
-            console.log('device added');
-            await device.vibrate(.1);
-            setTimeout(() => device.stop(), 200);
-        });
-
-        await client.connect(connector);
-        console.log('Connected!');
-        await client.startScanning();
     }
 }

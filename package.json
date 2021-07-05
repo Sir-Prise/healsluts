@@ -23,6 +23,7 @@
     "buttplug": "^1.0.14",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
+    "typicons.font": "^2.1.2",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
