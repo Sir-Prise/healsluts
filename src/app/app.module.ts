@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppComponent } from './app.component';
 import { AlphaCalculatorComponent } from './tools/alpha-calculator/alpha-calculator.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -17,6 +16,8 @@ import { ColorExtractComponent } from './tools/color-extract/color-extract.compo
 import { DevicesComponent } from './device/device-connector/device-connector.component';
 import { TypiconComponent } from './components/typicon/typicon.component';
 import { AlertComponent } from './components/alert/alert.component';
+import { HomeComponent } from './pages/home/home.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
     declarations: [
@@ -28,8 +29,10 @@ import { AlertComponent } from './components/alert/alert.component';
         DevicesComponent,
         TypiconComponent,
         AlertComponent,
+        HomeComponent,
     ],
     imports: [
+        AppRoutingModule,
         BrowserModule,
         FormsModule,
         ReactiveFormsModule
