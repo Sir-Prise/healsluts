@@ -4,26 +4,5 @@
     <app-devices></app-devices>
 
     <h2>Debugging</h2>
-    <button (click)="onStartManualMode()">Start in manual mode</button><br>
-    <button (click)="onAnalyzeFrame()">Analyze frame</button>
-    <input #expectedScreen type="text" placeholder="Expected screen" /><br>
-    <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video><br>
-    <div style="font-size:3em;">
-        <span>{{gameServiceResponse | async}}</span><br />
-    </div>
-
-    <h2>From video</h2>
-    Description: <input type="file" accept="text/plain" (change)="this.onChangeTestVideoDescription($event.target.files)"/><br />
-    Video: <input type="file" accept="video/*" (change)="this.onChangeTestVideo($event.target.files)"/><br />
-    <video #videoTest width="1920" height="1080" autoplay muted style="width: 192px; height: 108px;"></video><br />
-
-    <h2>Debugging tools</h2>
-    <h3>Annotate video</h3>
-    <app-video-annotator></app-video-annotator>
-    <h3>Color calculator</h3>
-    <app-alpha-calculator></app-alpha-calculator>
-    <h3>Check color match</h3>
-    <app-is-color-calculator></app-is-color-calculator>
-    <h3>Extract color</h3>
-    <app-color-extract [video]="video"></app-color-extract>
+    <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video>
 </div>

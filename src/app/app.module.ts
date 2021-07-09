@@ -18,6 +18,7 @@ import { TypiconComponent } from './components/typicon/typicon.component';
 import { AlertComponent } from './components/alert/alert.component';
 import { HomeComponent } from './pages/home/home.component';
 import { AppRoutingModule } from './app-routing.module';
+import { ToolsComponent } from './pages/tools/tools.component';
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { AppRoutingModule } from './app-routing.module';
         TypiconComponent,
         AlertComponent,
         HomeComponent,
+        ToolsComponent,
     ],
     imports: [
         AppRoutingModule,
