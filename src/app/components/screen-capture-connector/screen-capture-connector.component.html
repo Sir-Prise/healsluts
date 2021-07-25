@@ -1,0 +1,11 @@
+<p>
+    Select the game window so the website can watch the pixel colors. It says "share" but it doesn't get actually shared.
+</p>
+<button (click)="onStartVideo()" appAutoBlur>Select Overwatch window</button>
+<div [class.hidden]="!videoStarted">
+    <p>
+        You should see your game window here, without any black borders:
+    </p>
+    <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video><br />
+    <button (click)="onStopVideo()" appAutoBlur>Stop video</button>
+</div>

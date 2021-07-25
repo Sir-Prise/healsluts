@@ -20,6 +20,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ToolsComponent } from './pages/tools/tools.component';
 import { AutoBlurDirective } from './directives/auto-blur.directive';
+import { ScreenCaptureConnectorComponent } from './components/screen-capture-connector/screen-capture-connector.component';
 
 @NgModule({
     declarations: [
@@ -34,6 +35,7 @@ import { AutoBlurDirective } from './directives/auto-blur.directive';
         HomeComponent,
         ToolsComponent,
         AutoBlurDirective,
+        ScreenCaptureConnectorComponent,
     ],
     imports: [
         AppRoutingModule,

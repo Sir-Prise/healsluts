@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { share } from 'rxjs/operators';
 
 @Injectable()
 export class LoopManualService {
