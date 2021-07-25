@@ -1,0 +1,12 @@
+.step {
+    display: flex;
+}
+
+.step-number {
+    font-size: 3rem;
+    font-weight: bold;
+    line-height: .8;
+    min-width: 60px;
+    padding: 0 10px;
+    color: #444;
+}

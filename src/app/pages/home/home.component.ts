@@ -28,6 +28,8 @@ export class HomeComponent implements OnInit {
     @ViewChild('videoTest')
     public videoTestElement: ElementRef<HTMLVideoElement>;
 
+    public videoStarted = false;
+
     public gameServiceResponse: Observable<any>;
 
     private testVideoDescription?: string;
@@ -56,6 +58,8 @@ export class HomeComponent implements OnInit {
         await new Promise((resolve) => {
             this.videoElement.nativeElement.onloadedmetadata = resolve;
         });
+
+        this.videoStarted = true;
 
         const frameService = this.injector.get<IFrameService>(IFrameService) as FrameService;
         frameService.setup(this.videoElement.nativeElement);

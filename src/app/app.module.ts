@@ -19,6 +19,7 @@ import { AlertComponent } from './components/alert/alert.component';
 import { HomeComponent } from './pages/home/home.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ToolsComponent } from './pages/tools/tools.component';
+import { AutoBlurDirective } from './directives/auto-blur.directive';
 
 @NgModule({
     declarations: [
@@ -32,6 +33,7 @@ import { ToolsComponent } from './pages/tools/tools.component';
         AlertComponent,
         HomeComponent,
         ToolsComponent,
+        AutoBlurDirective,
     ],
     imports: [
         AppRoutingModule,

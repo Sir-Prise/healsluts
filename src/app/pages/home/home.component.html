@@ -1,8 +1,44 @@
 <div [style]="'background: rgba(0, 0, 255, ' + (gameServiceResponse | async) + ')'">
-    <button (click)="onStartVideo()">Start video</button><br>
-    <button (click)="onStartAnalyze()">Start analyze</button><br />
-    <app-devices></app-devices>
-
-    <h2>Debugging</h2>
-    <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video>
+    <p>
+        Playing the healer in multiplayer online games is fun on it's own, but you can make it even more fun by connecting a vibrator! The better you play, the higher is the vibration.
+    </p>
+    <p>
+        This website uses a browser feature which is usually used for screen sharing, but here it's used to check the color of certain pixels on the screen to determine how you play.
+        All analysis happens in your browser, your game screen is not actually shared.
+    </p>
+    <p>
+        For now, this website works for Overwatch and analyzes the "on-fire meter" below the health bar.
+        When you're dead the vibration should be zero, otherwise the intensity should match the value of the meter.
+    </p>
+    <hr />
+    <div class="step">
+        <div class="step-number">1</div>
+        <app-devices></app-devices>
+    </div>
+    <hr />
+    <div class="step">
+        <div class="step-number">2</div>
+        <div>
+            <p>
+                Select the game window so the website can watch the pixel colors. It says "share" but it doesn't get actually shared.
+            </p>
+            <button (click)="onStartVideo()" appAutoBlur>Select Overwatch window</button>
+            <div [class.hidden]="!videoStarted">
+                <p>
+                    You should see your game window here, without any black borders:
+                </p>
+                <video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="step">
+        <div class="step-number">3</div>
+        <div>
+            <p>
+                Do not molest other players.
+            </p>
+            <button (click)="onStartAnalyze()" appAutoBlur>Start playing</button>
+        </div>
+    </div>
 </div>
