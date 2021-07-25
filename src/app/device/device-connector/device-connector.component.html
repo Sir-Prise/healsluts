@@ -4,10 +4,10 @@
     to see which devices are supported or just try.
 </p>
 <div>
-    <app-alert *ngIf="!supportsBluetooth" [type]="'error'">
+    <app-alert *ngIf="!supportsBluetooth" type="error">
         Your browser doesn't support bluetooth. Please use an other browser like the current Google Chrome.
     </app-alert>
-    <app-alert *ngIf="supportsBluetooth && (hasBluetooth$ | async) === false" [type]="'error'">
+    <app-alert *ngIf="supportsBluetooth && (hasBluetooth$ | async) === false" type="error">
         Your device hasn't bluetooth. You could use an USB bluetooth adapter or switch to a different device like a laptop or smartphone.
     </app-alert>
 </div>
@@ -36,11 +36,7 @@
     </div>
     <button (click)="startScanning()" class="primary" appAutoBlur>Connect bluetooth device</button>
 
-    <app-alert *ngIf="isUnknownConnectionError" [type]="'error'">
-        Error while connecting to the device. Usually it helps to restart the browser.<br />
-        Note that on mobile devices you have to open the list of recently used apps and swipe the browser out of that list to fully close it.
-    </app-alert>
-    <app-alert *ngIf="error" [type]="'error'">
+    <app-alert *ngIf="error" type="error">
         Error: {{error}} (Buttplug.io)
     </app-alert>
 </div>

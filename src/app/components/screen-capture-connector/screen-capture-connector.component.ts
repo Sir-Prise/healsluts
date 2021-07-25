@@ -18,6 +18,7 @@ export class ScreenCaptureConnectorComponent implements OnInit {
     public videoElement: ElementRef<HTMLVideoElement>;
 
     public videoStarted = false;
+    public displayUnknownResolutionWarning = false;
 
     public ngOnInit(): void {
     }
@@ -44,6 +45,15 @@ export class ScreenCaptureConnectorComponent implements OnInit {
         await new Promise((resolve) => {
             this.videoElement.nativeElement.onloadedmetadata = resolve;
         });
+
+        // Check video resolution
+        const width = this.videoElement.nativeElement.videoWidth;
+        const height = this.videoElement.nativeElement.videoHeight;
+        if (width !== 1920 || height !== 1080) {
+            this.displayUnknownResolutionWarning = true;
+        } else {
+            this.displayUnknownResolutionWarning = false;
+        }
 
         this.videoStarted = true;
 
