@@ -41,6 +41,10 @@
                     <th>Detected screen</th>
                     <td>{{(gameServiceResponse | async)?.screen}}</td>
                 </tr>
+                <tr>
+                    <th>Analysis duration</th>
+                    <td>{{(gameServiceResponse | async)?.analysisDuration}} ms</td>
+                </tr>
             </table>
         </div>
     </div>

@@ -23,7 +23,7 @@ export class ScreenDetectionService<TScreenName extends OverwatchScreenName = Ov
     /**
      * Returns an observable emiting the detected screen every tick.
      */
-    public getScreen(): Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined'}> {
+    public getScreen(): Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined', startTimestamp: number}> {
         return this.frameService.getFrame().pipe(
             map((frame) => ({...frame, expected: undefined})),
             this.screenByPixelService.getScreen(),

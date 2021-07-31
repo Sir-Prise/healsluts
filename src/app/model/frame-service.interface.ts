@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 export abstract class IFrameService {
     getFrame: () => Observable<{
         frame: HTMLCanvasElement,
-        expected?: string
+        expected?: string,
+        startTimestamp: number,
     }>;
 }

@@ -40,7 +40,10 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
     >(
     ): OperatorFunction<T, T & {screen: TScreenName | 'undefined'}> {
         return (source: Observable<T>) => source.pipe(
-            map(({frame, expected}) => ({screen: this.analyzeScreen(frame, expected).screen, expected, frame} as T & {screen: TScreenName | 'undefined'}))
+            map((input) => ({
+                ...input,
+                screen: this.analyzeScreen(input.frame, input.expected).screen
+            } as T & {screen: TScreenName | 'undefined'}))
         );
     }
 

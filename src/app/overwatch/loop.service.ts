@@ -19,10 +19,10 @@ export class LoopService {
         this.interval = interval(setupService.loopInterval);
     }
 
-    public getInterval(): Observable<void> {
+    public getInterval(): Observable<{startTimestamp: number}> {
         return this.interval.pipe(
             filter(() => !this.isPaused),
-            map(() => {})
+            map(() => ({startTimestamp: Date.now()}))
         );
     }
 }

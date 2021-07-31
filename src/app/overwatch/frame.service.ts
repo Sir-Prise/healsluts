@@ -28,12 +28,12 @@ export class FrameService implements IFrameService {
         this.frameContext = this.frame.getContext('2d');
     }
 
-    public getFrame(): Observable<{frame: HTMLCanvasElement, expected?: never}> {
+    public getFrame(): Observable<{frame: HTMLCanvasElement, startTimestamp: number}> {
         return this.loopService.getInterval().pipe(
-            map(() => {
+            map(({startTimestamp}) => {
                 this.colorUtilsService.resetCache();
                 this.frameContext.drawImage(this.videoElement, 0, 0);
-                return {frame: this.frame};
+                return {frame: this.frame, startTimestamp};
             })
         );
     }

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, OperatorFunction } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { DeviceService } from '../device/device.service';
 import { DeathDetectionService } from './death-detection.service';
 import { DeathState } from './death-state.type';
+import { DurationService } from './duration.service';
 import { OnFireDetectionService } from './on-fire-detection.service';
 import { ScreenDetectionService } from './screen-detection.service';
 import { OverwatchScreenName } from './screen-names';
@@ -20,17 +21,25 @@ export class GameService {
         private readonly onFireDetectionService: OnFireDetectionService,
         private readonly deathDetectionService: DeathDetectionService,
         private readonly deviceService: DeviceService,
+        private readonly durationService: DurationService
     ) {
     }
 
-    public start(): Observable<{intensity: number, screen: OverwatchScreenName, deathState: DeathState, onFireValue: number}> {
+    public start(): Observable<{
+        intensity: number,
+        screen: OverwatchScreenName,
+        deathState: DeathState,
+        onFireValue: number,
+        analysisDuration: number
+    }> {
         // Initial negative push intensity to compensate old values still in detection services
         this.deviceService.setPushIntensity(-1, 2000);
 
         return this.screenDetectionService.getScreen().pipe(
             this.onFireDetectionService.addOnFireLevel(),
             this.deathDetectionService.addDeathState(),
-            map(({screen, onFireValue, deathState}) => {
+            map((input) => {
+                const {screen, onFireValue, deathState} = input;
                 let newIntensity: number | undefined;
                 if (deathState === 'alive') {
                     newIntensity = onFireValue;
@@ -44,8 +53,9 @@ export class GameService {
 
                 this.previousIntensity = newIntensity;
                 this.deviceService.setBaseIntensity(newIntensity);
-                return {intensity: newIntensity, screen, deathState, onFireValue};
+                return {...input, intensity: newIntensity};
             }),
+            this.durationService.addDuration(),
         );
     }
 

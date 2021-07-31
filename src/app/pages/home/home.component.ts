@@ -18,7 +18,13 @@ export class HomeComponent implements OnInit {
 
     public videoReady = false;
     public isPlaying = false;
-    public gameServiceResponse: Observable<{intensity: number, screen: OverwatchScreenName, deathState: DeathState, onFireValue: number}>;
+    public gameServiceResponse: Observable<{
+        intensity: number,
+        screen: OverwatchScreenName,
+        deathState: DeathState,
+        onFireValue: number,
+        analysisDuration: number
+    }>;
 
     public constructor(
         private readonly injector: Injector,
