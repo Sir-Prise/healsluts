@@ -13,7 +13,7 @@ export class HomeComponent implements OnInit {
     @ViewChild('videoTest')
     public videoTestElement: ElementRef<HTMLVideoElement>;
 
-
+    public videoReady = false;
     public gameServiceResponse: Observable<any>;
 
     public constructor(
@@ -22,6 +22,10 @@ export class HomeComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+    }
+
+    public onVideoReady(videoReady: boolean): void {
+        this.videoReady = videoReady;
     }
 
     public onStartAnalyze(): void {

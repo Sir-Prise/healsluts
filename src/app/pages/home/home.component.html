@@ -18,7 +18,7 @@
     <hr />
     <div class="step">
         <div class="step-number">2</div>
-        <app-screen-capture-connector></app-screen-capture-connector>
+        <app-screen-capture-connector (videoReady)="onVideoReady($event)"></app-screen-capture-connector>
     </div>
     <hr />
     <div class="step">
@@ -27,7 +27,7 @@
             <p>
                 Start playing but don't molest other players.
             </p>
-            <button (click)="onStartAnalyze()" appAutoBlur>Start playing</button>
+            <button (click)="onStartAnalyze()" appAutoBlur [disabled]="!videoReady">Start playing</button>
         </div>
     </div>
 </div>

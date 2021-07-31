@@ -57,6 +57,13 @@ button {
     &:active {
         border-color: #3b638a;
     }
+
+    &:disabled {
+        background: #aaa;
+        border-color: #aaa;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
 }
 
 p {

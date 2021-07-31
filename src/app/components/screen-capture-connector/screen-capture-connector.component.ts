@@ -14,6 +14,9 @@ export class ScreenCaptureConnectorComponent implements OnInit {
     ) {
     }
 
+    @Output()
+    public videoReady = new EventEmitter<boolean>();
+
     @ViewChild('video')
     public videoElement: ElementRef<HTMLVideoElement>;
 
@@ -53,6 +56,7 @@ export class ScreenCaptureConnectorComponent implements OnInit {
             this.displayUnknownResolutionWarning = true;
         } else {
             this.displayUnknownResolutionWarning = false;
+            this.videoReady.emit(true);
         }
 
         this.videoStarted = true;
@@ -66,6 +70,7 @@ export class ScreenCaptureConnectorComponent implements OnInit {
             track.stop();
         }
         this.videoElement.nativeElement.srcObject = null;
+        this.videoReady.emit(false);
         this.videoStarted = false;
     }
 }

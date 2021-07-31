@@ -17,4 +17,7 @@
       "dom"
     ]
   },
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  }
 }
