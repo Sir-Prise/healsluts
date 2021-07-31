@@ -104,7 +104,7 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
 
         this.log(frame, probableScreen, expected, sortedScreens);
 
-        console.log('Detected screen', this.lastScreenName, sortedScreens);
+        // console.log('Detected screen', this.lastScreenName, sortedScreens);
 
         return {frame, screen: this.lastScreenName};
     }
@@ -116,9 +116,12 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
     private log(
         frame: HTMLCanvasElement,
         actual: AnalyzedScreen<TScreenName | 'undefined'>,
-        expectedName: TScreenName | 'undefined',
+        expectedName: TScreenName | 'undefined' | undefined,
         sortedScreens: AnalyzedScreen<TScreenName>[]
     ): void {
+        if (expectedName === undefined) {
+            return;
+        }
         if (!this.screenNames.includes(expectedName)) {
             expectedName = 'undefined';
         }

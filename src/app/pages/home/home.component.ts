@@ -2,7 +2,9 @@ import { Component, ElementRef, Injector, OnInit, ViewChild } from '@angular/cor
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { DeviceService } from 'src/app/device/device.service';
+import { DeathState } from 'src/app/overwatch/death-state.type';
 import { GameService } from 'src/app/overwatch/game.service';
+import { OverwatchScreenName } from 'src/app/overwatch/screen-names';
 
 @Component({
     selector: 'app-home',
@@ -16,7 +18,7 @@ export class HomeComponent implements OnInit {
 
     public videoReady = false;
     public isPlaying = false;
-    public gameServiceResponse: Observable<any>;
+    public gameServiceResponse: Observable<{intensity: number, screen: OverwatchScreenName, deathState: DeathState, onFireValue: number}>;
 
     public constructor(
         private readonly injector: Injector,

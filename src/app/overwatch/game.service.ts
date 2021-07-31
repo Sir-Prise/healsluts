@@ -3,8 +3,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { DeviceService } from '../device/device.service';
 import { DeathDetectionService } from './death-detection.service';
+import { DeathState } from './death-state.type';
 import { OnFireDetectionService } from './on-fire-detection.service';
 import { ScreenDetectionService } from './screen-detection.service';
+import { OverwatchScreenName } from './screen-names';
 
 @Injectable({
     providedIn: 'root'
@@ -21,7 +23,7 @@ export class GameService {
     ) {
     }
 
-    public start(): Observable<unknown> {
+    public start(): Observable<{intensity: number, screen: OverwatchScreenName, deathState: DeathState, onFireValue: number}> {
         // Initial negative push intensity to compensate old values still in detection services
         this.deviceService.setPushIntensity(-1, 2000);
 

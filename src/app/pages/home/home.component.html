@@ -1,4 +1,4 @@
-<div [style]="'background: rgba(0, 0, 255, ' + (gameServiceResponse | async) + ')'">
+<div>
     <p>
         Playing the healer in multiplayer online games is fun on it's own, but you can make it even more fun by connecting a vibrator! The better you play, the higher is the vibration.
     </p>
@@ -29,7 +29,19 @@
             </p>
             <button *ngIf="!isPlaying" (click)="onStartGame()" appAutoBlur [disabled]="!videoReady">Start playing</button>
             <button *ngIf="isPlaying" (click)="onStopGame()" appAutoBlur>Stop playing</button>
-            <meter *ngIf="isPlaying"  [value]="deviceService.intensity$ | async"></meter>
+            <table *ngIf="isPlaying">
+                <tr>
+                    <th>Intensity</th>
+                    <td>
+                        <meter [value]="deviceService.intensity$ | async"></meter>
+                        {{deviceService.intensity$ | async | percent}}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Detected screen</th>
+                    <td>{{(gameServiceResponse | async)?.screen}}</td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>

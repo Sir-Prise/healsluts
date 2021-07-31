@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { IFrameService } from '../model/frame-service.interface';
 import { ScreenByPixelService } from './screen-by-pixel.service';
 import { OverwatchScreenName } from './screen-names';
@@ -25,6 +25,7 @@ export class ScreenDetectionService<TScreenName extends OverwatchScreenName = Ov
      */
     public getScreen(): Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined'}> {
         return this.frameService.getFrame().pipe(
+            map((frame) => ({...frame, expected: undefined})),
             this.screenByPixelService.getScreen(),
             this.screenPlausibilityService.clean(),
             tap((detection) => {
@@ -33,14 +34,6 @@ export class ScreenDetectionService<TScreenName extends OverwatchScreenName = Ov
                 }
             }),
         );
-        // return this.screenByPixelService.getScreen().pipe(
-        //     this.screenPlausibilityService.clean(),
-        //     tap((detection) => {
-        //         if (detection.screen === 'undefined') {
-        //             this.screenByPixelService.setLastScreenName('undefined');
-        //         }
-        //     })
-        // );
     }
 
     /**

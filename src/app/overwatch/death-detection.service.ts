@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, OperatorFunction } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FixedLengthArray } from '../utils/fixed-length-array';
+import { DeathState } from './death-state.type';
 import { OverwatchScreenName } from './screen-names';
 
 @Injectable({
@@ -46,5 +47,3 @@ export class DeathDetectionService {
         return undefined;
     }
 }
-
-type DeathState = 'alive' | 'dead' | undefined;
