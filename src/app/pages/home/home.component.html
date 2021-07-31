@@ -27,7 +27,9 @@
             <p>
                 Start playing but don't molest other players.
             </p>
-            <button (click)="onStartAnalyze()" appAutoBlur [disabled]="!videoReady">Start playing</button>
+            <button *ngIf="!isPlaying" (click)="onStartGame()" appAutoBlur [disabled]="!videoReady">Start playing</button>
+            <button *ngIf="isPlaying" (click)="onStopGame()" appAutoBlur>Stop playing</button>
+            <meter *ngIf="isPlaying"  [value]="deviceService.intensity$ | async"></meter>
         </div>
     </div>
 </div>

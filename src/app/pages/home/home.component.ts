@@ -1,6 +1,7 @@
 import { Component, ElementRef, Injector, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
+import { DeviceService } from 'src/app/device/device.service';
 import { GameService } from 'src/app/overwatch/game.service';
 
 @Component({
@@ -14,10 +15,12 @@ export class HomeComponent implements OnInit {
     public videoTestElement: ElementRef<HTMLVideoElement>;
 
     public videoReady = false;
+    public isPlaying = false;
     public gameServiceResponse: Observable<any>;
 
     public constructor(
         private readonly injector: Injector,
+        public readonly deviceService: DeviceService,
     ) {
     }
 
@@ -26,10 +29,22 @@ export class HomeComponent implements OnInit {
 
     public onVideoReady(videoReady: boolean): void {
         this.videoReady = videoReady;
+
+        if (!videoReady) {
+            this.onStopGame();
+        }
     }
 
-    public onStartAnalyze(): void {
+    public onStartGame(): void {
         const gameService = this.injector.get<GameService>(GameService) as GameService;
         this.gameServiceResponse = gameService.start().pipe(share());
+        this.isPlaying = true;
+    }
+
+    public onStopGame(): void {
+        this.gameServiceResponse = undefined;
+        const gameService = this.injector.get<GameService>(GameService) as GameService;
+        gameService.stop();
+        this.isPlaying = false;
     }
 }

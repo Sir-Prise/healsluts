@@ -22,6 +22,9 @@ export class GameService {
     }
 
     public start(): Observable<unknown> {
+        // Initial negative push intensity to compensate old values still in detection services
+        this.deviceService.setPushIntensity(-1, 2000);
+
         return this.screenDetectionService.getScreen().pipe(
             this.onFireDetectionService.addOnFireLevel(),
             this.deathDetectionService.addDeathState(),
@@ -42,5 +45,11 @@ export class GameService {
                 return {intensity: newIntensity, screen, deathState, onFireValue};
             }),
         );
+    }
+
+    public stop(): void {
+        // Canceling the observable subscription is handled by caller
+
+        this.deviceService.setBaseIntensity(-1);
     }
 }

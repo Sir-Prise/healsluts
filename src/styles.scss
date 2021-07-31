@@ -61,7 +61,6 @@ button {
     &:disabled {
         background: #aaa;
         border-color: #aaa;
-        pointer-events: none;
         cursor: not-allowed;
     }
 }

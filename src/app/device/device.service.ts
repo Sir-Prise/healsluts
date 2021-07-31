@@ -7,12 +7,13 @@ import { Subject } from 'rxjs';
 })
 export class DeviceService {
 
-    public deviceChanges$ = new Subject<{event: 'connected' | 'disconnected', device: ButtplugClientDevice}>();
-    public errors$ = new Subject<Error>();
+    public readonly intensity$ = new Subject<number>();
+
+    public readonly deviceChanges$ = new Subject<{event: 'connected' | 'disconnected', device: ButtplugClientDevice}>();
+    public readonly errors$ = new Subject<Error>();
 
     private connectedDevices: ButtplugClientDevice[] = [];
 
-    private readonly intensity$ = new Subject<number>();
     private baseIntensity = 0;
     private pushIntensity = 0;
 
@@ -69,7 +70,7 @@ export class DeviceService {
     }
 
     private updateIntensity(): void {
-        this.intensity$.next(this.baseIntensity + this.pushIntensity);
+        this.intensity$.next(Math.min(Math.max(this.baseIntensity + this.pushIntensity, 0), 1));
     }
 
     private errorHandler(error: Error): void {
