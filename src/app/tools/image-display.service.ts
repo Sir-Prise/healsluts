@@ -77,7 +77,9 @@ export class ImageDisplayService implements IFrameService {
         return undefined;
     }
 
-    public getFrame(): Observable<{frame: HTMLCanvasElement, expected: string}> {
-        return this.frames$;
+    public getFrame(): Observable<{frame: HTMLCanvasElement, expected: string, startTimestamp: number}> {
+        return this.frames$.pipe(
+            map((input) => ({...input, startTimestamp: Date.now()}))
+        );
     }
 }

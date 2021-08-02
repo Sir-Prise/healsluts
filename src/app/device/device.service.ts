@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ButtplugClient, ButtplugClientDevice, ButtplugEmbeddedConnectorOptions, buttplugInit } from 'buttplug';
 import { Subject } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { AnalyticsService } from '../services/analytics.service';
 
 @Injectable({
     providedIn: 'root'
@@ -18,7 +20,9 @@ export class DeviceService {
     private pushIntensity = 0;
 
     constructor() {
-        this.intensity$.subscribe((intensity) => {
+        this.intensity$.pipe(
+            distinctUntilChanged(),
+        ).subscribe((intensity) => {
             try {
                 for (const device of this.connectedDevices) {
                     device.vibrate(intensity);
@@ -48,6 +52,7 @@ export class DeviceService {
     private onDeviceAdded(device: ButtplugClientDevice): void {
         this.connectedDevices.push(device);
         this.deviceChanges$.next({event: 'connected', device});
+        AnalyticsService.event('device added', 'devices', device.Name);
     }
     private onDeviceRemoved(device: ButtplugClientDevice): void {
         const index = this.connectedDevices.indexOf(device);

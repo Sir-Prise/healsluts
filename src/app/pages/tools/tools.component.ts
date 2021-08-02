@@ -80,7 +80,8 @@ export class ToolsComponent implements OnInit {
         loopManualService.tick();
     }
 
-    public onChangeTestVideoDescription(files: FileList): void {
+    public onChangeTestVideoDescription(event: Event): void {
+        const files = (event.target as HTMLInputElement).files;
         const reader = new FileReader();
         reader.onload = () => {
             this.testVideoDescription = reader.result.toString();
@@ -88,9 +89,10 @@ export class ToolsComponent implements OnInit {
         reader.readAsText(files[0]);
     }
 
-    public onChangeTestVideo(files: FileList): void {
+    public onChangeTestVideo(event: Event): void {
+        const files = (event.target as HTMLInputElement).files;
         this.setupService.useImageDisplayService = true;
-        const imageDisplayService = this.injector.get<IFrameService>(IFrameService) as ImageDisplayService;
+        const imageDisplayService = this.injector.get<IFrameService>(IFrameService) as unknown as ImageDisplayService;
         imageDisplayService.setDescription(this.testVideoDescription);
         imageDisplayService.onChangeTestVideo(this.videoTestElement.nativeElement, files);
         this.setupService.useImageDisplayService = true;

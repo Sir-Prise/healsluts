@@ -18,7 +18,8 @@ export class VideoAnnotatorComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    public onChangeDescribeVideo(files: FileList): void {
+    public onChangeDescribeVideo(event: Event): void {
+        const files = (event.target as HTMLInputElement).files;
         this.videoDescribeElement.nativeElement.src = URL.createObjectURL(files[0]);
     }
 

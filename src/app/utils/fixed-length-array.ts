@@ -18,7 +18,7 @@ export class FixedLengthArray<T> {
         }
     }
 
-    public getValues<TFallback>(): T[] {
+    public getValues(): T[] {
         return this.previousValues;
     }
 }

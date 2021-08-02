@@ -12,8 +12,8 @@
 </div>
 
 <h2>From video</h2>
-Description: <input type="file" accept="text/plain" (change)="this.onChangeTestVideoDescription($event.target.files)"/><br />
-Video: <input type="file" accept="video/*" (change)="this.onChangeTestVideo($event.target.files)"/><br />
+Description: <input type="file" accept="text/plain" (change)="this.onChangeTestVideoDescription($event)"/><br />
+Video: <input type="file" accept="video/*" (change)="this.onChangeTestVideo($event)"/><br />
 <video #videoTest width="1920" height="1080" autoplay muted style="width: 192px; height: 108px;"></video><br />
 
 <h2>Tools</h2>
