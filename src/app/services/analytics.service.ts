@@ -14,7 +14,6 @@ export class AnalyticsService {
      * @param value Value when it's a number
      */
     public static event(action: string, category?: string, label?: string, value?: number): void {
-        console.log('gtag event', {action, category, label, value});
         // tslint:disable-next-line:no-string-literal
         if (!window['gtag']) {
             return;
