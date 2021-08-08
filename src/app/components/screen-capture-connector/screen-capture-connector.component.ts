@@ -52,13 +52,13 @@ export class ScreenCaptureConnectorComponent implements OnInit {
         // Check video resolution
         const width = this.videoElement.nativeElement.videoWidth;
         const height = this.videoElement.nativeElement.videoHeight;
-        if (width !== 1920 || height !== 1080) {
+        if (Math.round(1000 * width / height) !== Math.round(1000 * 16 / 9)) {
             this.displayUnknownResolutionWarning = true;
         } else {
             this.displayUnknownResolutionWarning = false;
-            this.videoReady.emit(true);
         }
 
+        this.videoReady.emit(true);
         this.videoStarted = true;
 
         const frameService = this.injector.get<IFrameService>(IFrameService) as FrameService;

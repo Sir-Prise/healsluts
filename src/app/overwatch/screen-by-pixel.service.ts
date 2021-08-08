@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, OperatorFunction } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { IFrameService } from '../model/frame-service.interface';
+import { map, tap } from 'rxjs/operators';
 import { ScreenPoint } from '../model/screen-point.model';
 import { Screen } from '../model/screen.model';
 import { ColorDifferenceService } from '../tools/color-difference.service';
@@ -16,38 +15,42 @@ import { ScreenSettingsService } from './screen-settings.service';
     providedIn: 'root'
 })
 export class ScreenByPixelService<TScreenName extends OverwatchScreenName = OverwatchScreenName> {
-    private screens: Observable<{frame: HTMLCanvasElement, screen: TScreenName | 'undefined'}>;
-    private readonly screenNames: Array<TScreenName | 'undefined'>;
+    private screenNames: Array<TScreenName | 'undefined'>;
     private lastScreenName: TScreenName | 'undefined';
 
     public reliability = new Map<TScreenName | 'undefined', {correct: number, incorrect: number}>();
 
     public constructor(
-        private readonly frameService: IFrameService,
         private readonly screenSettingsService: ScreenSettingsService<TScreenName>,
         private readonly colorUtilsService: ColorUtilsService,
         private readonly colorDifferenceService: ColorDifferenceService,
     ) {
-        this.screenNames = Object.keys(this.screenSettingsService.getScreens()) as TScreenName[];
-
-        this.screens = this.frameService.getFrame().pipe(
-            map(({frame, expected}) => this.analyzeScreen(frame, expected as TScreenName | 'undefined'))
-        );
     }
 
     public getScreen<
         T extends {frame: HTMLCanvasElement, expected?: TScreenName | 'undefined'}
     >(
     ): OperatorFunction<T, T & {screen: TScreenName | 'undefined'}> {
+        let firstFrame = true;
         return (source: Observable<T>) => source.pipe(
+            tap(({frame}) => {
+                if (firstFrame) {
+                    firstFrame = false;
+
+                    // Initialize screen settings
+                    this.screenSettingsService.init(frame.width, frame.height);
+                    this.screenNames = Object.keys(this.screenSettingsService.getScreens()) as TScreenName[];
+                    console.log('screens', this.screenSettingsService.getScreens());
+                }
+            }),
             map((input) => ({
                 ...input,
-                screen: this.analyzeScreen(input.frame, input.expected).screen
+                screen: this.analyzeScreen(input.frame, input.expected)
             } as T & {screen: TScreenName | 'undefined'}))
         );
     }
 
-    private analyzeScreen(frame: HTMLCanvasElement, expected?: TScreenName | 'undefined'): {frame: HTMLCanvasElement, screen: TScreenName | 'undefined'} {
+    private analyzeScreen(frame: HTMLCanvasElement, expected?: TScreenName | 'undefined'): TScreenName | 'undefined' {
         // Get all screens and their defined probability based on which was the last screen
         const screenBaseProbabilities = this.screenNames.reduce(
             (prev, curr) => ({...prev, [curr]: 0.3}), {} as Record<TScreenName | 'undefined', number>);
@@ -109,7 +112,7 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
 
         // console.log('Detected screen', this.lastScreenName, sortedScreens);
 
-        return {frame, screen: this.lastScreenName};
+        return this.lastScreenName;
     }
 
     public setLastScreenName(screenName: 'undefined' | TScreenName): void {

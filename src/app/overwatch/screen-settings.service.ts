@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ColorRGBAPosition } from '../model/color-rgba-position.model';
-import { Position } from '../model/position.model';
+import { ScreenPoint } from '../model/screen-point.model';
 import { Screen } from '../model/screen.model';
 import { OverwatchScreenName } from './screen-names';
 
@@ -59,13 +58,12 @@ const IN_GAME_ON_FIRE_ICONS = [
     {name: 'on fire max marker', x: 432, y: 996, color: IN_GAME_ON_FIRE_MAX_MARKER},
 ];
 
-// Default "max duration" for all screens which usually aren't visible for very long but are theoretically it's possible to see them longer
+// Default "max duration" for all screens which usually aren't visible for very long but theoretically it's possible to see them longer
 const MAX_DURATION_SANE = 10_000;
 
 // Types
 type ScreensModel<T extends string> = Record<T, Screen<T>>;
 
-// TODO: Don't use upper 20px because FPS overlay
 const screens: ScreensModel<OverwatchScreenName> = {
     menues: {
         name: 'menues',
@@ -310,17 +308,51 @@ const screens: ScreensModel<OverwatchScreenName> = {
     }
 };
 
+/**
+ * Class which returns the existing screens.
+ *
+ * Areas to avoid:
+ * - Upper left corner (20px height on 1080): FPS
+ * - Voice chat overlay
+ * - Discord overlay?
+ */
 @Injectable({
     providedIn: 'root'
 })
 export class ScreenSettingsService<TScreenName extends OverwatchScreenName = OverwatchScreenName> {
+
+    private scaledScreens?: ScreensModel<TScreenName>;
+
+    public init(width = 1920, height = 1080): void {
+        this.scaledScreens = screens as unknown as ScreensModel<TScreenName>;
+        for (const key of Object.keys(this.scaledScreens)) {
+            if (this.scaledScreens[key].must) {
+                this.scaledScreens[key].must = this.scaleScreenPoints(this.scaledScreens[key].must, width, height);
+            }
+            if (this.scaledScreens[key].should) {
+                this.scaledScreens[key].should = this.scaleScreenPoints(this.scaledScreens[key].should, width, height);
+            }
+            if (this.scaledScreens[key].might) {
+                this.scaledScreens[key].might = this.scaleScreenPoints(this.scaledScreens[key].might, width, height);
+            }
+        }
+    }
+
     public getScreens(): ScreensModel<TScreenName> {
-        return screens as unknown as ScreensModel<TScreenName>;
+        return this.scaledScreens;
     }
 
     public getScreen(
         screenName: OverwatchScreenName
     ): Screen<TScreenName> {
         return this.getScreens()[screenName];
+    }
+
+    private scaleScreenPoints(screenPoints: ScreenPoint[], width: number, height: number): ScreenPoint[] {
+        return screenPoints.map((screenPoint) => ({
+            ...screenPoint,
+            x: Math.round(screenPoint.x * width / 1920),
+            y: Math.round(screenPoint.y * height / 1080),
+        }));
     }
 }
