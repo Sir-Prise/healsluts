@@ -22,17 +22,10 @@
     <hr />
     <div class="step">
         <div class="step-number">2</div>
-        <app-screen-capture-connector (videoReady)="onVideoReady($event)"></app-screen-capture-connector>
-    </div>
-    <hr />
-    <div class="step">
-        <div class="step-number">3</div>
         <div>
-            <p>
-                Start playing but don't molest other players.
-            </p>
-            <button *ngIf="!isPlaying" (click)="onStartGame()" appAutoBlur [disabled]="!videoReady">Start playing</button>
-            <button *ngIf="isPlaying" (click)="onStopGame()" appAutoBlur>Stop playing</button>
+            <app-screen-capture-connector (videoReady)="onVideoReady($event)"></app-screen-capture-connector>
+            <button *ngIf="isPlaying" (click)="onStopGame()" appAutoBlur>Pause playing</button>
+            <button *ngIf="!isPlaying && videoReady" (click)="onStartGame()" appAutoBlur>Resume playing</button>
             <table *ngIf="isPlaying">
                 <tr>
                     <th>Intensity</th>

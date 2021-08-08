@@ -38,7 +38,9 @@ export class HomeComponent implements OnInit {
     public onVideoReady(videoReady: boolean): void {
         this.videoReady = videoReady;
 
-        if (!videoReady) {
+        if (videoReady) {
+            this.onStartGame();
+        }else {
             this.onStopGame();
         }
     }
