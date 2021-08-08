@@ -12,6 +12,7 @@ export class DevicesComponent implements OnInit {
     public readonly supportsBluetooth = !!(navigator as any).bluetooth;
     public readonly hasBluetooth$: Promise<boolean> | undefined = (navigator as any).bluetooth?.getAvailability();
 
+    public loading$ = this.deviceService.loading$;
     public devices: Array<{status: 'connected' | 'disconnected', device: ButtplugClientDevice}> = [];
     public get isDeviceConnected(): boolean {
         return this.devices.some((device) => device.status === 'connected');

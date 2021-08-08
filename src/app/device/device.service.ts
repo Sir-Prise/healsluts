@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ButtplugClient, ButtplugClientDevice, ButtplugEmbeddedConnectorOptions, buttplugInit } from 'buttplug';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { AnalyticsService } from '../services/analytics.service';
 
@@ -12,6 +12,7 @@ export class DeviceService {
     public readonly intensity$ = new Subject<number>();
 
     public readonly deviceChanges$ = new Subject<{event: 'connected' | 'disconnected', device: ButtplugClientDevice}>();
+    public readonly loading$ = new BehaviorSubject<boolean>(false);
     public readonly errors$ = new Subject<Error>();
 
     private connectedDevices: ButtplugClientDevice[] = [];
@@ -34,6 +35,7 @@ export class DeviceService {
     }
 
     public async connectDevice(): Promise<void> {
+        this.loading$.next(true);
         try {
             await buttplugInit();
             const connector = new ButtplugEmbeddedConnectorOptions();
@@ -43,9 +45,11 @@ export class DeviceService {
             client.addListener('deviceremoved', this.onDeviceRemoved.bind(this));
 
             await client.connect(connector);
+            this.loading$.next(false);
             await client.startScanning();
         } catch (e) {
             this.errorHandler(e);
+            this.loading$.next(false);
         }
     }
 

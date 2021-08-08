@@ -47,6 +47,7 @@ button {
     box-shadow: 0 0 5px #0003;
     margin-bottom: 1em;
     font-family: inherit;
+    position: relative;
 
     &:hover, &:focus {
         border-color: #fff;
@@ -62,6 +63,34 @@ button {
         background: #aaa;
         border-color: #aaa;
         cursor: not-allowed;
+    }
+
+    &.loading {
+        padding-left: 50px;
+        pointer-events: none;
+    
+        &:before {
+            content: "";
+            display: inline-block;
+            $loadingSpinnerDiameter: 28px;
+            $loadingSpinnerStrokeWidth: 4px;
+            border: $loadingSpinnerStrokeWidth solid #fff;
+            border-top-color: rgba(0, 0, 0, 0);
+            border-left-color: rgba(0, 0, 0, 0);
+            width: $loadingSpinnerDiameter - ($loadingSpinnerStrokeWidth * 2);
+            height: $loadingSpinnerDiameter - ($loadingSpinnerStrokeWidth * 2);
+            border-radius: 50%;
+            animation: loadingSpinner 1s infinite linear;
+            position: absolute;
+            left: 20px;
+            margin-top: -11px;
+            top: 50%;
+            
+            @keyframes loadingSpinner {
+                from { transform: rotate(0deg)   }
+                to   { transform: rotate(360deg) }
+            }
+        }
     }
 }
 
