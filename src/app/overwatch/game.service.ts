@@ -38,14 +38,14 @@ export class GameService {
         onFireValue: number,
         analysisDuration: number
     }> {
-        // Initial negative push intensity to compensate old values still in detection services
-        this.deviceService.setPushIntensity(-1, 2000);
-
         this.isPlaying = true;
         AnalyticsService.event('start playing', 'game');
         this.startTimestamp = Date.now();
         this.durations = [];
         this.maxIntensity = 0;
+
+        // Game start haptic feedback
+        this.deviceService.setPushIntensity(0.1, 200);
 
         return this.screenDetectionService.getScreen().pipe(
             this.onFireDetectionService.addOnFireLevel(),
@@ -57,8 +57,7 @@ export class GameService {
                     newIntensity = onFireValue;
                 } else if (deathState === 'dead') {
                     newIntensity = 0;
-                    // Set push-intensity to -1 to counter all positive pushs
-                    this.deviceService.setPushIntensity(-1, 500);
+                    this.deviceService.stop();
                 } else {
                     newIntensity = Math.max(this.previousIntensity - .02, 0);
                 }
@@ -93,6 +92,8 @@ export class GameService {
             AnalyticsService.event('average analysis duration (ms)', 'game', undefined, Math.round(ArrayUtils.average(this.durations)));
         }
 
-        this.deviceService.setBaseIntensity(-1);
+        this.onFireDetectionService.reset();
+
+        this.deviceService.stop();
     }
 }

@@ -41,6 +41,10 @@ export class OnFireDetectionService {
         );
     }
 
+    public reset(): void {
+        this.previousValues = [{value: 0, confidence: .5}];
+    }
+
     private getCurrentLevel(frame: HTMLCanvasElement): Value | undefined {
         try {
             // Check that on fire icons are visible (because they aren't when overlay is shaking)

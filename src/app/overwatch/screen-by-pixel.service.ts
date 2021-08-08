@@ -40,7 +40,6 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
                     // Initialize screen settings
                     this.screenSettingsService.init(frame.width, frame.height);
                     this.screenNames = Object.keys(this.screenSettingsService.getScreens()) as TScreenName[];
-                    console.log('screens', this.screenSettingsService.getScreens());
                 }
             }),
             map((input) => ({

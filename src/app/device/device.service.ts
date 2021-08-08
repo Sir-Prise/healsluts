@@ -20,6 +20,8 @@ export class DeviceService {
     private baseIntensity = 0;
     private pushIntensity = 0;
 
+    private activePushes = [];
+
     constructor() {
         this.intensity$.pipe(
             distinctUntilChanged(),
@@ -72,10 +74,22 @@ export class DeviceService {
     public setPushIntensity(addedIntensity: number, duration: number): void {
         this.pushIntensity += addedIntensity;
         this.updateIntensity();
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             this.pushIntensity -= addedIntensity;
             this.updateIntensity();
+            this.activePushes = this.activePushes.filter((push) => push !== timeoutId);
         }, duration);
+        this.activePushes.push(timeoutId);
+    }
+
+    /**
+     * Stops base intensity and all current pushes
+     */
+    public stop(): void {
+        this.baseIntensity = 0;
+        this.pushIntensity = 0;
+        this.activePushes = [];
+        this.updateIntensity();
     }
 
     private updateIntensity(): void {
