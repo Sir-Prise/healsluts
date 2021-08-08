@@ -122,7 +122,7 @@ export class OnFireDetectionService {
             if (!(e instanceof InvalidDetectionError)) {
                 throw e;
             } else {
-                console.warn(`OnFireDetection failed: ${e.message}`);
+                // console.warn(`OnFireDetection failed: ${e.message}`);
             }
 
             return undefined;

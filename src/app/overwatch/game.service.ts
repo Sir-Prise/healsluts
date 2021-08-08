@@ -57,6 +57,7 @@ export class GameService {
                     newIntensity = onFireValue;
                 } else if (deathState === 'dead') {
                     newIntensity = 0;
+                    this.onFireDetectionService.reset();
                     this.deviceService.stop();
                 } else {
                     newIntensity = Math.max(this.previousIntensity - .02, 0);
