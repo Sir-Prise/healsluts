@@ -51,8 +51,8 @@ export class OnFireDetectionService {
                 throw new InvalidDetectionError('Icons not found');
             }
 
-            const barColors = this.getRangeColor(frame, 0, 1.3);
-            const glowColors = this.getRangeColor(frame, 0, 1.3, true);
+            const barColors = this.getRangeColor(frame);
+            const glowColors = this.getRangeColor(frame, true);
 
             // Find position of the glow effect below the bar
             const countGlowing = glowColors.filter((isGlowing) => isGlowing).length;
@@ -94,6 +94,10 @@ export class OnFireDetectionService {
                 if (!glowPostion || glowPostion < 10) {
                     confidence -= .5;
                 }
+                // Check if background is not white aswell
+                if (this.isBackgroundWhite(frame)) {
+                    throw new InvalidDetectionError('background is white');
+                }
 
             } else {
                 // Bar neither blue nor white, probably empty
@@ -123,17 +127,32 @@ export class OnFireDetectionService {
 
     private getRangeColor(
         frame: HTMLCanvasElement,
-        min: number,
-        max: number,
         checkGlow = false
     ): Array<'blue' | 'white' | undefined | boolean> {
         const output: Array<'blue' | 'white' | undefined | boolean> = [];
-        for (let value = min; value <= max; value += 0.1) {
+        for (let value = 0; value <= 1.3; value += 0.1) {
             // Make it easier to loop through values (1.29 is maximum)
             const checkPosition = value < 1.3 ? value : 1.29;
             output.push(checkGlow ? this.getValueGlow(frame, checkPosition) : this.getValueColor(frame, checkPosition));
         }
         return output;
+    }
+
+    /**
+     * Checks if background is white too so bar has no confidence
+     */
+    private isBackgroundWhite(frame: HTMLCanvasElement): boolean {
+        let countWhite = 0;
+        for (let value = 0; value <= 1.3; value += 0.1) {
+            const checkPosition = value < 1.3 ? value : 1.29;
+            if (this.getValueColor(frame, checkPosition) === 'white') {
+                countWhite++;
+                if (countWhite >= 8) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private indexToValue(index: number): number {
