@@ -122,7 +122,7 @@ export class OnFireDetectionService {
             if (!(e instanceof InvalidDetectionError)) {
                 throw e;
             } else {
-                // console.warn(`OnFireDetection failed: ${e.message}`);
+                console.warn(`OnFireDetection failed: ${e.message}`);
             }
 
             return undefined;
@@ -149,7 +149,7 @@ export class OnFireDetectionService {
         let countWhite = 0;
         for (let value = 0; value <= 1.3; value += 0.1) {
             const checkPosition = value < 1.3 ? value : 1.29;
-            if (this.getValueColor(frame, checkPosition) === 'white') {
+            if (this.getValueColor(frame, checkPosition, 6) === 'white') {
                 countWhite++;
                 if (countWhite >= 8) {
                     return true;
@@ -163,8 +163,11 @@ export class OnFireDetectionService {
         return Math.min(index / 10, 1);
     }
 
-    private getValueColor(frame: HTMLCanvasElement, value: number): 'blue' | 'white' | undefined {
-        const position = this.getPosition(value);
+    private getValueColor(frame: HTMLCanvasElement, value: number, yOffset = 0): 'blue' | 'white' | undefined {
+        let position = this.getPosition(value);
+        if (yOffset) {
+            position = {...position, y: position.y + yOffset};
+        }
         const isBlue = this.colorUtilsService.pixelIsColor(frame, position, ON_FIRE_BAR_BLUE);
         const isWhite = this.colorUtilsService.pixelIsColor(frame, position, ON_FIRE_BAR_WHITE);
 

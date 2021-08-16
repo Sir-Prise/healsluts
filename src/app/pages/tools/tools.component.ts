@@ -98,6 +98,9 @@ export class ToolsComponent implements OnInit {
         this.setupService.useImageDisplayService = true;
         const screenDetectionService = this.injector.get<ScreenDetectionService>(ScreenDetectionService) as ScreenDetectionService;
         screenDetectionService.getScreen().subscribe({
+            next(args): void {
+                console.log(args);
+            },
             complete(): void {
                 screenDetectionService.log();
             }
