@@ -5,7 +5,7 @@
 </p>
 <div>
     <app-alert *ngIf="!supportsBluetooth" type="error">
-        Your browser doesn't support bluetooth. Please use an other browser like the current Google Chrome.
+        Your browser doesn't support bluetooth. Please use an other browser like Google Chrome or Microsoft Edge.
     </app-alert>
     <app-alert *ngIf="supportsBluetooth && (hasBluetooth$ | async) === false" type="error">
         Your device hasn't bluetooth. You can use a USB bluetooth adapter or switch to a different device like a laptop with bluetooth.
