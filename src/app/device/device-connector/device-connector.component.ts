@@ -13,6 +13,7 @@ export class DevicesComponent implements OnInit {
     public readonly hasBluetooth$: Promise<boolean> | undefined = (navigator as any).bluetooth?.getAvailability();
 
     public loading$ = this.deviceService.loading$;
+    public userGestureRequired = false;
     public devices: Array<{status: 'connected' | 'disconnected', device: ButtplugClientDevice}> = [];
     public get isDeviceConnected(): boolean {
         return this.devices.some((device) => device.status === 'connected');
@@ -26,6 +27,8 @@ export class DevicesComponent implements OnInit {
     ) {
         // Using an own list of devices instead of this.deviceService.connectedDevices to be able to list disconnected devices
         this.deviceService.deviceChanges$.subscribe((event) => {
+            this.userGestureRequired = false;
+
             // Remove existing devices with the same name and old status
             this.devices = this.devices.filter((device) => {
                 return device.device.Name !== event.device.Name || device.status === event.event;
@@ -44,7 +47,16 @@ export class DevicesComponent implements OnInit {
     }
 
     public async startScanning(): Promise<void> {
+        this.userGestureRequired = false;
+        const startTime = Date.now();
+
         await this.deviceService.connectDevice();
+
+        // When loading takes more than 5 seconds, the browser will throw an error because scanning for devices requires a user gesture.
+        // It's not possible to catch this error as Buttplug.io currently only logs errors to console but doesn't throw an js error.
+        if (Date.now() - startTime > 5_000 && !this.isDeviceConnected) {
+            this.userGestureRequired = true;
+        }
     }
 
     public async test(): Promise<void> {

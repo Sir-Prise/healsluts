@@ -35,6 +35,9 @@
         </ng-template>
     </div>
     <button (click)="startScanning()" appAutoBlur [class.loading]="loading$ | async">Connect bluetooth device</button>
+    <app-alert *ngIf="userGestureRequired" type="warning">
+        Loading completed. Please click the button again to select a device.
+    </app-alert>
 
     <app-alert *ngIf="error" type="error">
         Error: {{error}} (Buttplug.io)
