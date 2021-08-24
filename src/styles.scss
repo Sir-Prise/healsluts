@@ -24,6 +24,11 @@ header {
     text-transform: uppercase;
     color: #fff;
     padding-top: 40px;
+
+    h1 {
+        font-weight: 700;
+        margin: 0;
+    }
 }
 main {
     background: #fffd;
@@ -37,7 +42,7 @@ footer {
 }
 
 button {
-    display: block;
+    display: inline-block;
     background: #68A9E9;
     border: 3px solid #68A9E9;
     padding: 10px 20px;
@@ -115,4 +120,18 @@ hr {
 
 .hidden {
     display: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 1em;
+    margin-bottom: .2em;
+    font-weight: 600;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.17em;
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class LoopManualService {
@@ -9,8 +10,10 @@ export class LoopManualService {
     constructor() {
     }
 
-    public getInterval(): Observable<void> {
-        return this.events;
+    public getInterval(): Observable<{startTimestamp: number}> {
+        return this.events.pipe(
+            map(() => ({startTimestamp: Date.now()}))
+        );
     }
 
     public tick(): void {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ScreenPoint } from '../model/screen-point.model';
 import { Screen } from '../model/screen.model';
+import { PositionUtils } from '../utils/position-utils';
 import { OverwatchScreenName } from './screen-names';
 
 // Colors
@@ -351,8 +352,7 @@ export class ScreenSettingsService<TScreenName extends OverwatchScreenName = Ove
     private scaleScreenPoints(screenPoints: ScreenPoint[], width: number, height: number): ScreenPoint[] {
         return screenPoints.map((screenPoint) => ({
             ...screenPoint,
-            x: Math.round(screenPoint.x * width / 1920),
-            y: Math.round(screenPoint.y * height / 1080),
+            ...PositionUtils.scale(screenPoint, width, height)
         }));
     }
 }

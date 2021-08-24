@@ -1,15 +1,22 @@
-<button (click)="onStartVideo()">Start video</button><br>
-<button (click)="onStartAnalyze()">Start analyze</button><br />
-<app-devices></app-devices>
+<h2>Source</h2>
+<button (click)="startSourceScreen()">Start screen capture</button><br />
+<button (click)="clickVideoInput()">Start from video file</button><br />
+<input #videoFileInput type="file" accept="video/*" (change)="changeVideoInput($event)" class="video-input" />
+<video #video autoplay width="1920" height="1080" style="width: 384px; height: 216px;" controls muted></video><br>
 
-<h2>Debugging</h2>
-<button (click)="onStartManualMode()">Start in manual mode</button><br>
-<button (click)="onAnalyzeFrame()">Analyze frame</button>
-<input #expectedScreen type="text" placeholder="Expected screen" /><br>
-<video #video autoplay width="1920" height="1080" style="width: 192px; height: 108px;"></video><br>
-<div style="font-size:3em;">
-    <span>{{gameServiceResponse | async | json}}</span><br />
-</div>
+<h2>Analyze</h2>
+<button (click)="startAnalyzeNormal()">Normal</button><br />
+<button (click)="startAnalyzeFrame()">Frame by frame</button>
+<input (change)="changeExpectedScreen($event)" type="text" placeholder="Expected screen" />
+
+<h2>Response</h2>
+<pre>{{gameServiceResponse | async | json}}</pre>
+
+
+
+<hr>
+
+
 
 <h2>From video</h2>
 Description: <input type="file" accept="text/plain" (change)="this.onChangeTestVideoDescription($event)"/><br />

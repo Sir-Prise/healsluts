@@ -25,12 +25,17 @@ export class ToolsComponent implements OnInit {
     @ViewChild('video')
     public videoElement: ElementRef<HTMLVideoElement>;
 
+    @ViewChild('videoFileInput')
+    public videoFileInputElement: ElementRef<HTMLInputElement>;
+
     @ViewChild('videoTest')
     public videoTestElement: ElementRef<HTMLVideoElement>;
 
     public gameServiceResponse: Observable<any>;
 
     private testVideoDescription?: string;
+
+    private frameByFrameInitialized = false;
 
     public constructor(
         private readonly injector: Injector,
@@ -41,7 +46,7 @@ export class ToolsComponent implements OnInit {
     public ngOnInit(): void {
     }
 
-    public async onStartVideo(): Promise<void> {
+    public async startSourceScreen(): Promise<void> {
         // Get video stream
         this.videoElement.nativeElement.srcObject = await (navigator.mediaDevices as any).getDisplayMedia({
             video: {
@@ -56,29 +61,49 @@ export class ToolsComponent implements OnInit {
         await new Promise((resolve) => {
             this.videoElement.nativeElement.onloadedmetadata = resolve;
         });
+    }
 
+    public clickVideoInput(): void {
+        this.videoFileInputElement.nativeElement.click();
+    }
+
+    public changeVideoInput(event: Event): void {
+        const files = (event.target as HTMLInputElement).files;
+        this.videoElement.nativeElement.src = URL.createObjectURL(files[0]);
+    }
+
+    public startAnalyzeNormal(): void {
+        this.initFrameService();
+        this.initGameService();
+    }
+
+    public startAnalyzeFrame(): void {
+        if (!this.frameByFrameInitialized) {
+            this.setupService.useManualLoop = true;
+            this.initFrameService();
+            this.initGameService();
+            this.frameByFrameInitialized = true;
+        }
+        const loopManualService = this.injector.get<LoopService>(LoopService) as unknown as LoopManualService;
+        loopManualService.tick();
+    }
+
+    private initFrameService(): void {
         const frameService = this.injector.get<IFrameService>(IFrameService) as FrameService;
         frameService.setup(this.videoElement.nativeElement);
     }
 
-    public async onStartManualMode(): Promise<void> {
-        this.setupService.useManualLoop = true;
-
-        await this.onStartVideo();
-
+    private initGameService(): void {
         const gameService = this.injector.get<GameService>(GameService) as GameService;
         this.gameServiceResponse = gameService.start().pipe(share());
     }
 
-    public onStartAnalyze(): void {
-        const gameService = this.injector.get<GameService>(GameService) as GameService;
-        this.gameServiceResponse = gameService.start().pipe(share());
+    public changeExpectedScreen(event: Event): void {
+        this.setupService.expectedScreen = (event.target as HTMLInputElement).value || undefined;
     }
 
-    public onAnalyzeFrame(): void {
-        const loopManualService = this.injector.get<LoopService>(LoopService) as unknown as LoopManualService;
-        loopManualService.tick();
-    }
+
+    ////////////
 
     public onChangeTestVideoDescription(event: Event): void {
         const files = (event.target as HTMLInputElement).files;
