@@ -49,8 +49,8 @@ export class OnFireDetectionService {
         try {
             // Check that on fire icons are visible (because they aren't when overlay is shaking)
             if (
-                !this.colorUtilsService.pixelIsColor(frame, {x: 257, y: 997}, {r: 255, g: 255, b: 255, a: 0.85}) ||
-                !this.colorUtilsService.pixelIsColor(frame, {x: 432, y: 996}, {r: 255, g: 255, b: 255, a: 0.79})
+                !this.colorUtilsService.pixelIsColorRelative(frame, {x: 257, y: 997}, {r: 255, g: 255, b: 255, a: 0.85}) ||
+                !this.colorUtilsService.pixelIsColorRelative(frame, {x: 432, y: 996}, {r: 255, g: 255, b: 255, a: 0.79})
             ) {
                 throw new InvalidDetectionError('Icons not found');
             }
@@ -168,8 +168,8 @@ export class OnFireDetectionService {
         if (yOffset) {
             position = {...position, y: position.y + yOffset};
         }
-        const isBlue = this.colorUtilsService.pixelIsColor(frame, position, ON_FIRE_BAR_BLUE);
-        const isWhite = this.colorUtilsService.pixelIsColor(frame, position, ON_FIRE_BAR_WHITE);
+        const isBlue = this.colorUtilsService.pixelIsColorRelative(frame, position, ON_FIRE_BAR_BLUE);
+        const isWhite = this.colorUtilsService.pixelIsColorRelative(frame, position, ON_FIRE_BAR_WHITE);
 
         if (isBlue && isWhite) {
             throw new InvalidDetectionError('Bar is blue AND white');
@@ -185,7 +185,7 @@ export class OnFireDetectionService {
     private getValueGlow(frame: HTMLCanvasElement, value: number): boolean {
         const barPosition = this.getPosition(value);
         const glowPosition = {x: barPosition.x, y: barPosition.y + 6};
-        return this.colorUtilsService.pixelIsColor(frame, glowPosition, ON_FIRE_BAR_GLOW);
+        return this.colorUtilsService.pixelIsColorRelative(frame, glowPosition, ON_FIRE_BAR_GLOW);
     }
 
     /**

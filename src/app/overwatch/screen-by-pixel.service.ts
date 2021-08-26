@@ -154,7 +154,7 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
 
         const expectedScreenPoints = this.getScreenPoints(expectedName);
         const expectedIncorrectPoints = expectedScreenPoints.filter(
-            (point) => !this.colorUtilsService.pixelIsColor(frame, point, point.color));
+            (point) => !this.colorUtilsService.pixelIsColorAbsolute(frame, point, point.color));
         const actualScreenPoints = this.getScreenPoints(actual.name);
 
         if (actualScreenPoints.length === actual.probability.matchingPoints.length &&
@@ -167,7 +167,7 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
                 `${expectedIncorrectPoints.length} of ${expectedScreenPoints.length} points (without forgiveness) DON'T match of expected screen "${expectedName}"`
             );
             for (const point of expectedIncorrectPoints) {
-                const actualColor = this.colorUtilsService.getPixelColor(frame, point);
+                const actualColor = this.colorUtilsService.getPixelColorAbsolute(frame, point);
                 console.log(`Point "${point.name}" (x: ${point.x}, y: ${point.y}) ${point.importance} be different.`);
                 console.log(...this.colorDifferenceService.getColorDifference(actualColor, point.color));
             }
@@ -207,7 +207,7 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
         let matchingLowContrastCount = 0;
 
         const sum = points.reduce((prev, curr) => {
-            let pixelIsColor = this.colorUtilsService.pixelIsColor(frame, curr.colorPosition, curr.colorPosition.color);
+            let pixelIsColor = this.colorUtilsService.pixelIsColorAbsolute(frame, curr.colorPosition, curr.colorPosition.color);
 
             if (pixelIsColor) {
                 matchingPoints.push({point: curr.colorPosition, forgiven: false});
@@ -229,7 +229,7 @@ export class ScreenByPixelService<TScreenName extends OverwatchScreenName = Over
             // Check for matching points if contrast to neighboring points is high enough
             let factor = curr.factor;
             if (pixelIsColor && curr.colorPosition.contrast) {
-                if (this.colorUtilsService.getContrast(frame, curr.colorPosition, curr.colorPosition.contrast) < 0.15) {
+                if (this.colorUtilsService.getContrastAbsolute(frame, curr.colorPosition, curr.colorPosition.contrast) < 0.15) {
                     matchingLowContrastCount++;
                     factor *= .9;
                 }

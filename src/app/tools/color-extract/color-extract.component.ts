@@ -48,7 +48,7 @@ export class ColorExtractComponent implements OnInit {
 
         this.colorUtilsService.resetCache();
         for (const position of positions) {
-            const color = this.colorUtilsService.getPixelColor(this.frame, position);
+            const color = this.colorUtilsService.getPixelColorAbsolute(this.frame, position);
             this.colorsOutputElement.nativeElement.value += `\n${color.r}\t${color.g}\t${color.b}`;
         }
     }

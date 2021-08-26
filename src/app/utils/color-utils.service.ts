@@ -3,6 +3,7 @@ import { ColorPosition } from '../model/color-position.model';
 import { ColorRGBA } from '../model/color-rgba.model';
 import { Color } from '../model/color.model';
 import { Position } from '../model/position.model';
+import { PositionUtils } from './position-utils';
 
 const MAX_CONTRAST = 255 * 3;
 
@@ -18,14 +19,14 @@ export class ColorUtilsService {
     private pixelColorCache: ColorPosition[] = [];
 
     constructor() {
-        // Create canvas for getPixelColor() as it's much faster when created once and not every time.
+        // Create canvas once as it's much faster when not created every time.
         const canvas = document.createElement('canvas');
         canvas.width = 1;
         canvas.height = 1;
         this.pixelContext = canvas.getContext('2d');
     }
 
-    public getPixelColor(frame: HTMLCanvasElement, position: Position): Color {
+    public getPixelColorAbsolute(frame: HTMLCanvasElement, position: Position): Color {
         // Check if already analyzed
         const cachedValue = this.pixelColorCache.find((colorPosition) => colorPosition.x === position.x && colorPosition.y === position.y);
         if (cachedValue) {
@@ -67,7 +68,11 @@ export class ColorUtilsService {
         );
     }
 
-    public pixelIsColor(frame: HTMLCanvasElement, position: Position, color: ColorRGBA): boolean {
+    public pixelIsColorRelative(frame: HTMLCanvasElement, position: Position, color: ColorRGBA): boolean {
+        return this.pixelIsColorAbsolute(frame, PositionUtils.scale(position, frame.width, frame.height), color);
+    }
+
+    public pixelIsColorAbsolute(frame: HTMLCanvasElement, position: Position, color: ColorRGBA): boolean {
         // const pxColor = this.getPixelColor(frame, position);
         // console.log(
         //     'isColor',
@@ -76,7 +81,7 @@ export class ColorUtilsService {
         //     color
         // );
 
-        return this.isColor(this.getPixelColor(frame, position), color);
+        return this.isColor(this.getPixelColorAbsolute(frame, position), color);
     }
 
     /**
@@ -84,9 +89,9 @@ export class ColorUtilsService {
      *
      * @returns A value between 0 (no difference) and 1 (black + white)
      */
-    public getContrast(frame: HTMLCanvasElement, positionA: Position, positionB: Position): number {
-        const aColor = this.getPixelColor(frame, positionA);
-        const bColor = this.getPixelColor(frame, positionB);
+    public getContrastAbsolute(frame: HTMLCanvasElement, positionA: Position, positionB: Position): number {
+        const aColor = this.getPixelColorAbsolute(frame, positionA);
+        const bColor = this.getPixelColorAbsolute(frame, positionB);
         const diff = Math.abs(aColor.r - bColor.r) + Math.abs(aColor.g - bColor.g) + Math.abs(aColor.b - bColor.b);
         return diff / MAX_CONTRAST;
     }
