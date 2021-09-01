@@ -8,7 +8,10 @@
 <button (click)="onStartVideo()" appAutoBlur>Select Overwatch window & start playing</button>
 <div [class.hidden]="!videoStarted">
     <app-alert *ngIf="displayUnknownResolutionWarning" type="warning">
-        This game is only optimized for 16:9 screen resolutions and likely doesn't work for your resolution which is {{videoElement.nativeElement.videoWidth}}×{{videoElement.nativeElement.videoHeight}}px.
+        Please ensure that you're playing in fullscreen (windowed) mode.
+    </app-alert>
+    <app-alert *ngIf="smallDisplayWarning" type="warning">
+        Your screen resolution ({{videoElement.nativeElement.videoWidth}}×{{videoElement.nativeElement.videoHeight}}px) is smaller than the recommended size (1080px height) and might not work so well.
     </app-alert>
     <p>
         You should see your game window here, without any black borders:

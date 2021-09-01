@@ -1,6 +1,6 @@
 <p>
     Start by connecting your bluetooth toy with this game. Check out
-    <a href="https://iostindex.com/?filter0ButtplugSupport=4" target="_blank" rel="noopener nofollow">this list</a>
+    <a href="https://iostindex.com/?filter0ButtplugSupport=4&filter1Connection=Bluetooth%202,Bluetooth%204%20LE" target="_blank" rel="noopener nofollow">this list</a>
     to see which devices are supported or just try.
 </p>
 <div>
@@ -34,7 +34,7 @@
             </button>
         </ng-template>
     </div>
-    <button (click)="startScanning()" appAutoBlur [class.loading]="loading$ | async">Connect bluetooth device</button>
+    <button (click)="startScanning()" appAutoBlur [class.loading]="loading$ | async" class="connect-button">Connect bluetooth device</button>
     <app-alert *ngIf="userGestureRequired" type="warning">
         Loading completed. Please click the button again to select a device.
     </app-alert>
